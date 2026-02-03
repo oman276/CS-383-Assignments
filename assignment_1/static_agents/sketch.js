@@ -26,7 +26,7 @@ let p = {
 
   // number of distinct midpoints per line
   lineMidpoints : 3,
-  lineMidpointsMin : 0,
+  lineMidpointsMin : 1,
   lineMidpointsMax : 10,
 
   // max distance of each midpoint from the center line
@@ -51,13 +51,27 @@ let overlayImage;
 let dialImage;
 let switchImage;
 
+let staticAudio;
+const staticVolume = 0.1;
+const staticFadeTime = 7.0;
+
+let beepAudio;
+const beepVolume = 0.2;
+const beepFadeTime = 2.0;
+
+let clickAudio;
+const clickVolume = 0.3;
+
+let buttonAudio;
+const buttonVolume = 0.3;
+
 let effectActive = false;
 
 const controls = [
   { name: "dial1", x: -buffer_width/2 + 90,  y: buffer_height/2 + 30, radius: 32 },
   { name: "dial2", x: -buffer_width/2 + 250, y: buffer_height/2 + 30, radius: 32 },
   { name: "dial3", x: -buffer_width/2 + 410, y: buffer_height/2 + 30, radius: 32 },
-  { name: "switch", x: buffer_width/2 - 75,  y: buffer_height/2 + 30, radius: 40 } // adjust radius as needed
+  { name: "switch", x: buffer_width/2 - 75,  y: buffer_height/2 + 30, radius: 40 } 
 ];
 
 let activeElement = null;
@@ -71,6 +85,11 @@ function preload() {
   overlayImage = loadImage('assets/w700.png');
   dialImage = loadImage('assets/dial_bw.png');
   switchImage = loadImage('assets/switch_darker.png');
+
+  staticAudio = loadSound('assets/static_loop.flac');
+  beepAudio = loadSound('assets/beep_loop.wav');
+  clickAudio = loadSound('assets/click.wav');
+  buttonAudio = loadSound('assets/button_press.mp3');
 }
 
 function setup() {
@@ -82,10 +101,21 @@ function setup() {
   createAgents();
 
   frameRate(30);
+
+  staticAudio.setVolume(staticVolume);
+  beepAudio.setVolume(0);
+
+  clickAudio.setVolume(clickVolume);
+  clickAudio.playMode('untilDone');
+  buttonAudio.setVolume(buttonVolume);
+  buttonAudio.playMode('sustain');
+  
+  staticAudio.loop();
+  beepAudio.loop();
 }
 
 function draw() {
-  activeElement = null;
+  activeElement = null; 
 
   background(20);
 
@@ -164,8 +194,8 @@ function draw() {
 
 
   // detect where the mouse is, in relation to the zoom
-  let mx = (mouseX - width / 2) / currentZoom;
-  let my = (mouseY - height / 2) / currentZoom;
+  const mx = (mouseX - width / 2) / currentZoom;
+  const my = (mouseY - height / 2) / currentZoom;
 
   // check each control for mouse overlap
   for (let control of controls){
@@ -306,6 +336,9 @@ function activateEffect(){
     a.forceBlack();
   }
   resetTimer = gsap.delayedCall(5, deactivateEffect);
+
+  beepAudio.setVolume(beepVolume, beepFadeTime); 
+  staticAudio.setVolume(0, beepFadeTime);
 }
 
 function deactivateEffect(){
@@ -328,10 +361,13 @@ function deactivateEffect(){
     duration: 7,
     ease: "power2.inOut"
   });
-  
+
   gsap.delayedCall(7, () => {
     effectActive = false;
   });
+
+  beepAudio.setVolume(0, staticFadeTime);
+  staticAudio.setVolume(staticVolume, staticFadeTime);
 }
 
 function efficientRandomPop(array) {
@@ -352,28 +388,36 @@ function mouseWheel(event) {
     p.lineNum -= event.delta * 0.01;
     p.lineNum = constrain(p.lineNum, p.lineNumMin, p.lineNumMax);
     paramChanged("lineNum");
+    clickAudio.play();
   }
   else if (activeElement == "dial2"){
     p.lineMidpoints -= event.delta * 0.01;
     p.lineMidpoints = constrain(p.lineMidpoints, p.lineMidpointsMin, p.lineMidpointsMax);
     paramChanged("lineMidpoints");
+    clickAudio.play();
   }
   else if (activeElement == "dial3"){
     p.lineDivergence -= event.delta * 0.001;
     p.lineDivergence = constrain(p.lineDivergence, p.lineDivergenceMin, p.lineDivergenceMax);
     paramChanged("lineDivergence");
+    clickAudio.play();
   }
 
-  return false;
 }
 
 function mousePressed(){
+  userStartAudio();
+
   if (activeElement == "switch" && !effectActive){
     p.activateEffect = !p.activateEffect;
     if (p.activateEffect) {
+      buttonAudio.play();
       activateEffect();
     } else {
       deactivateEffect();
     }
   }
+}
+
+function mouseMoved(){
 }
