@@ -31,6 +31,9 @@ function setup() {
   // define the colors
   backgroundColorLight = color(108, 167, 240);
   backgroundColorDark = color(39, 98, 168);
+
+  // define font data for everyone
+  textFont('IBM Plex Mono');
 }
 
 function draw() {
@@ -41,9 +44,17 @@ function draw() {
   createCanvas(windowWidth, windowHeight);
   background(backgroundColor);
 
+  for (let textBox of textBoxesToRender) {
+    textBox.updatePosition();
+  }
+
   // load text boxes
   for (let textBox of textBoxesToRender) {
-    textBox.display();
+    textBox.displayMainText();
+  }
+
+  for (let textBox of textBoxesToRender) {
+    textBox.displayHighlightedText();
   }
 }
 
@@ -56,11 +67,16 @@ function gotSpeech() {
     console.log(speechRec.resultString);
     audiotext = speechRec.resultString;
     let words = audiotext.split(" ");
-    for (let word of words) {
+    let word_num = words.length;
+    let div_range = windowHeight / word_num;
+
+    for (let i = 0; i < words.length; i++) {
+      let word = words[i];
       query.query(word, 1).then((posts) => {
         for (let post of posts) {
-          // console.log("QUERY FOR ", word, " - ", post.record.text);
-          textBoxesToRender.push(new PostTextBox(post.record.text, random(50, 500), random(50, 500), [word]));
+          textBoxesToRender.push(new PostTextBox(post.record.text, 
+            windowWidth + random(10, 50), 
+            random(div_range * i, div_range * (i + 1)), [word]));
         }
       });
     }
