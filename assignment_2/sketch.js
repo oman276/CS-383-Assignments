@@ -46,7 +46,7 @@ function draw() {
   textBoxesToRender.forEach((textBox) => textBox.updatePosition());
   textBoxesToRender.forEach((textBox) => textBox.displayMainText());
   textBoxesToRender.forEach((textBox) => textBox.displayHighlightedText());
-  console.log(textBoxesToRender.length, " text boxes rendering");
+  // console.log(textBoxesToRender.length, " text boxes rendering");
 }
 
 function windowResized() {}
@@ -65,11 +65,19 @@ function gotSpeech() {
       let word = words[i];
       query.query(word, 1).then((posts) => {
         for (let post of posts) {
-          textBoxesToRender.push(new PostTextBox(post.record.text, 
+          textBoxesToRender.push(new PostTextBox(filterText(post.record.text), 
             windowWidth + random(10, 50), 
             random(div_range * i, div_range * (i + 1)), [word]));
         }
       });
     }
   }
+}
+
+function filterText(text){
+  // remove newlines
+  text = text.replace(/\n/g, " ");
+  // remove emojis
+  text = text.replace(/\p{Extended_Pictographic}/gu, '');
+  return text;
 }

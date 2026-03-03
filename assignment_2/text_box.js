@@ -27,7 +27,7 @@ class PostTextBox {
     // which is probably how this works under the hood anyways
     findTargetWords() {
         for (let targetWord of this.targetWords) {
-            let index = this.text.toUpperCase().indexOf(" " + targetWord.toUpperCase() + " ");
+            let index = this.text.toUpperCase().indexOf(targetWord.toUpperCase());
             this.targetWordPositions.push(index);
         }
 
@@ -35,7 +35,7 @@ class PostTextBox {
             let targetWordPosition = this.targetWordPositions[i];
             if (targetWordPosition == -1) continue; // do we want to do something in this scenario?
             let targetWord = this.targetWords[i];
-            let spaces = " ".repeat(targetWordPosition - 1);
+            let spaces = " ".repeat(targetWordPosition);
             let substring = this.text.substring(targetWordPosition, targetWordPosition + targetWord.length);
             this.highlightedText.push(spaces + substring);
         }
