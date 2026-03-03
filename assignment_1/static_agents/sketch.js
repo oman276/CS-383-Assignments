@@ -134,7 +134,6 @@ function draw() {
   scale(currentZoom);
   imageMode(CENTER);
   
-  //ambientLight(30); 
   spotLight(
     255, 255, 255,    
     0, -800, -70,     
@@ -142,13 +141,6 @@ function draw() {
     PI / 4,
     40                 
   );
-
-  //background box
-  push();
-  noStroke();
-  translate(0, 0, -1);
-  box(buffer_width, buffer_height, 2);
-  pop();
 
   // floor 
   push();
@@ -209,13 +201,6 @@ function draw() {
 
 // create the grid of agents, one agent per grid location
 function createAgents() {
-  // setup the canvas
-  if (p.fillScreen) {
-    resizeCanvas(windowWidth, windowHeight);
-  } else {
-    resizeCanvas(600, 600);
-  }
-
   agents = [];
 
   // tile spacing between agent centers
@@ -417,7 +402,4 @@ function mousePressed(){
       deactivateEffect();
     }
   }
-}
-
-function mouseMoved(){
 }

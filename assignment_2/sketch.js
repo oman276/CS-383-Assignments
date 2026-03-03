@@ -5,6 +5,9 @@ let audiotext;
 
 let query;
 
+let backgroundColorLight;
+let backgroundColorDark;
+
 function setup() {
   speechRec = new p5.SpeechRec("en-US", gotSpeech);
   audiotext = "";
@@ -20,21 +23,19 @@ function setup() {
   // NOTE: You must fill in your credentials in config.js for this to work
   // Not sharing my own credentials on github. Get your own!
   query = new BlueskyQuery(BSKY_HANDLE, BSKY_PASSWORD);
-  // query
-  //   .query("hello", 5)
-  //   .then((posts) => {
-  //     for (let post of posts) {
-  //       console.log(post.record.text);
-  //     }
-  //   })
-  //   .catch((error) => {
-  //     console.error("Error querying posts:", error);
-  //   });
+
+  // define the colors
+  backgroundColorLight = color(108, 167, 240);
+  backgroundColorDark = color(39, 98, 168);
 }
 
 function draw() {
-  createCanvas(400, 400);
-  background(40);
+  let backgroundColor = map(sin(frameCount * 0.01), -1, 1, backgroundColorLight, backgroundColorDark);
+
+  // draw image
+  // createCanvas(400, 400);
+  createCanvas(windowWidth, windowHeight, WEBGL);
+  background(backgroundColor);
   textSize(30);
   fill(255);
   textColor = color(255, 0, 0);
