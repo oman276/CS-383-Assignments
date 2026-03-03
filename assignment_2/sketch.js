@@ -59,8 +59,8 @@ function gotSpeech() {
     for (let word of words) {
       query.query(word, 1).then((posts) => {
         for (let post of posts) {
-          console.log("QUERY FOR ", word, " - ", post.record.text);
-          textBoxesToRender.push(new PostTextBox(post.record.text, random(50, 500), random(50, 500)));
+          // console.log("QUERY FOR ", word, " - ", post.record.text);
+          textBoxesToRender.push(new PostTextBox(post.record.text, random(50, 500), random(50, 500), [word]));
         }
       });
     }

@@ -48,7 +48,7 @@ class BlueskyQuery {
         console.log(post.record.text + " ---- " + post.record.createdAt);
       });
 			*/
-      console.log(query, ": word query successful");
+      // console.log(query, ": word query successful");
 
       return data.posts;
     } catch (error) {

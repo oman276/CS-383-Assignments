@@ -1,5 +1,6 @@
 class PostTextBox {
     constructor(text, init_x, init_y, target_words = []) {
+        console.log("CREATING POST TEXT BOX WITH TEXT: ", text);
         this.text = text;
         this.textColor = color(255, 255, 255);
         this.highlightedTextColor = color(50, 227, 189);
@@ -18,7 +19,8 @@ class PostTextBox {
 
     findTargetWords() {
         for (let targetWord of this.targetWords) {
-            let index = this.text.indexOf(targetWord);
+            // possible formatting check?
+            let index = this.text.toUpperCase().indexOf(targetWord.toUpperCase());
             this.targetWordPositions.push(index);
         }
 
@@ -26,7 +28,8 @@ class PostTextBox {
             let targetWordPosition = this.targetWordPositions[i];
             if (targetWordPosition == -1) continue;
             let targetWord = this.targetWords[i];
-            this.highlightedText.push(targetWord);
+            let spaces = " ".repeat(targetWordPosition);
+            this.highlightedText.push(spaces + targetWord);
         }
     }
 
@@ -40,10 +43,10 @@ class PostTextBox {
 
         fill(this.textColor);
         text(this.text, this.x, this.y, this.textWrapWidth);
-
-        for (let i = 0; i < this.targetWordPositions.length; i++) {
-            let targetWord = this.targetWords[i];
-            let targetWordPosition = this.targetWordPositions[i];
+        for (let highlightedText of this.highlightedText) {
+            console.log("HIGHLIGHTED TEXT: ", highlightedText);
+            fill(this.highlightedTextColor);
+            text(highlightedText, this.x, this.y, this.textWrapWidth);
         }
     }
 }
