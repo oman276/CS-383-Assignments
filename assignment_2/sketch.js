@@ -8,6 +8,10 @@ let query;
 let backgroundColorLight;
 let backgroundColorDark;
 
+// test version, at some point this will have to be an array I guess
+let textBoxToRender;
+let textBoxesToRender = [];
+
 function setup() {
   speechRec = new p5.SpeechRec("en-US", gotSpeech);
   audiotext = "";
@@ -30,16 +34,17 @@ function setup() {
 }
 
 function draw() {
-  let backgroundColor = map(sin(frameCount * 0.01), -1, 1, backgroundColorLight, backgroundColorDark);
+  // get elements
+  let backgroundColor = lerpColor(backgroundColorLight, backgroundColorDark, sin(frameCount * 0.005));
 
-  // draw image
-  // createCanvas(400, 400);
-  createCanvas(windowWidth, windowHeight, WEBGL);
+  // draw image on screen
+  createCanvas(windowWidth, windowHeight);
   background(backgroundColor);
-  textSize(30);
-  fill(255);
-  textColor = color(255, 0, 0);
-  text(audiotext, 50, 50);
+
+  // load text boxes
+  for (let textBox of textBoxesToRender) {
+    textBox.display();
+  }
 }
 
 function windowResized() {}
@@ -55,6 +60,7 @@ function gotSpeech() {
       query.query(word, 1).then((posts) => {
         for (let post of posts) {
           console.log("QUERY FOR ", word, " - ", post.record.text);
+          textBoxesToRender.push(new PostTextBox(post.record.text, random(50, 500), random(50, 500)));
         }
       });
     }
