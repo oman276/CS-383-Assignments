@@ -11,7 +11,9 @@ function setup() {
 
   speechRec.start(true, false);
 
-  query = new BlueskyQuery();
+  // NOTE: You must fill in your credentials in config.js for this to work
+  // Not sharing my own credentials on github. Get your own!
+  query = new BlueskyQuery(BSKY_HANDLE, BSKY_PASSWORD);
   query.query("hello");
 }
 
