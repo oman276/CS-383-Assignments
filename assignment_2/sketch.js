@@ -14,7 +14,16 @@ function setup() {
   // NOTE: You must fill in your credentials in config.js for this to work
   // Not sharing my own credentials on github. Get your own!
   query = new BlueskyQuery(BSKY_HANDLE, BSKY_PASSWORD);
-  query.query("hello");
+  // query
+  //   .query("hello", 5)
+  //   .then((posts) => {
+  //     for (let post of posts) {
+  //       console.log(post.record.text);
+  //     }
+  //   })
+  //   .catch((error) => {
+  //     console.error("Error querying posts:", error);
+  //   });
 }
 
 function draw() {
@@ -34,6 +43,13 @@ function gotSpeech() {
   if (speechRec.resultValue) {
     console.log(speechRec.resultString);
     audiotext = speechRec.resultString;
-    // text(speechRec.resultString, 50, 100);
+    let words = audiotext.split(" ");
+    for (let word of words) {
+      query.query(word, 1).then((posts) => {
+        for (let post of posts) {
+          console.log("QUERY FOR ", word, " - ", post.record.text);
+        }
+      });
+    }
   }
 }

@@ -1,9 +1,11 @@
 class BlueskyQuery {
-  queryURL = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchposts";
+  queryURL = "https://bsky.social/xrpc/app.bsky.feed.searchposts";
 
   constructor(handle, appPassword) {
     this.handle = handle;
     this.appPassword = appPassword;
+
+    this.authenticate();
   }
 
   async authenticate() {
@@ -29,23 +31,31 @@ class BlueskyQuery {
     }
   }
 
-  async query(query) {
+  async query(query, limit = 10) {
     if (!this.accessToken) {
       await this.authenticate();
     }
 
-    let specificURL = `${this.queryURL}?q=${encodeURIComponent(query)}&limit=10`;
+    let specificURL = `${this.queryURL}?q=${encodeURIComponent(query)}&limit=${limit}`;
     try {
       let response = await fetch(specificURL, {
         headers: { Authorization: `Bearer ${this.accessToken}` },
       });
       let data = await response.json();
 
+      /*
       data.posts.forEach((post) => {
         console.log(post.record.text + " ---- " + post.record.createdAt);
       });
+			*/
+      console.log(query, ": word query successful");
+
+      return data.posts;
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   }
+
+  // at some point we'll also want to be able to grab from the firehose
+  // we'll also want a content filter for porn and trump
 }
