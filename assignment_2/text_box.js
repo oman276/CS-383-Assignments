@@ -15,7 +15,10 @@ class PostTextBox {
 
         this.findTargetWords();
 
-        this.speed = map(this.text.length, 0, 300, 2, 1);;
+        this.speed = map(this.text.length, 0, 300, 2, 1);
+
+        // We'll do any filtering in the space above
+        this.maxWidth = textWidth(this.text);
     }
 
 
@@ -56,5 +59,9 @@ class PostTextBox {
             fill(this.highlightedTextColor);
             text(highlightedText, this.x, this.y);
         }
+    }
+
+    isOffScreen() {
+        return this.x + this.maxWidth < 0;
     }
 }

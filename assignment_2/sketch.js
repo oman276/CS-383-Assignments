@@ -8,8 +8,6 @@ let query;
 let backgroundColorLight;
 let backgroundColorDark;
 
-// test version, at some point this will have to be an array I guess
-let textBoxToRender;
 let textBoxesToRender = [];
 
 function setup() {
@@ -44,18 +42,11 @@ function draw() {
   createCanvas(windowWidth, windowHeight);
   background(backgroundColor);
 
-  for (let textBox of textBoxesToRender) {
-    textBox.updatePosition();
-  }
-
-  // load text boxes
-  for (let textBox of textBoxesToRender) {
-    textBox.displayMainText();
-  }
-
-  for (let textBox of textBoxesToRender) {
-    textBox.displayHighlightedText();
-  }
+  textBoxesToRender = textBoxesToRender.filter((textBox) => !textBox.isOffScreen());
+  textBoxesToRender.forEach((textBox) => textBox.updatePosition());
+  textBoxesToRender.forEach((textBox) => textBox.displayMainText());
+  textBoxesToRender.forEach((textBox) => textBox.displayHighlightedText());
+  console.log(textBoxesToRender.length, " text boxes rendering");
 }
 
 function windowResized() {}
