@@ -3,11 +3,16 @@ function preload() {}
 let speechRec;
 let audiotext;
 
+let query;
+
 function setup() {
   speechRec = new p5.SpeechRec("en-US", gotSpeech);
   audiotext = "";
 
   speechRec.start(true, false);
+
+  query = new BlueskyQuery();
+  query.query("hello");
 }
 
 function draw() {
