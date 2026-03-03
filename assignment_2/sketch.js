@@ -9,7 +9,13 @@ function setup() {
   speechRec = new p5.SpeechRec("en-US", gotSpeech);
   audiotext = "";
 
-  speechRec.start(true, false);
+  speechRec.continuous = true;
+  speechRec.interimResults = false;
+  speechRec.start();
+
+  speechRec.onEnd = () => {
+    speechRec.start();
+  };
 
   // NOTE: You must fill in your credentials in config.js for this to work
   // Not sharing my own credentials on github. Get your own!
