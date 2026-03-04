@@ -10,6 +10,13 @@ let backgroundColorDark;
 
 let textBoxesToRender = [];
 
+let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+let alphabetIndex = 0;
+
+// cloud info
+let min_time_between_clouds = 3000;
+let max_time_between_clouds = 8000;
+
 function setup() {
   speechRec = new p5.SpeechRec("en-US", gotSpeech);
   audiotext = "";
@@ -32,6 +39,8 @@ function setup() {
 
   // define font data for everyone
   textFont('IBM Plex Mono');
+
+  
 }
 
 function draw() {
@@ -59,6 +68,14 @@ function gotSpeech() {
     let words = audiotext.split(" ");
     let word_num = words.length;
     let div_range = windowHeight / word_num;
+
+    query.firehose("a", 10).then((posts) => {
+      for (let post of posts) {
+        post.record.text = filterText(post.record.text);
+        console.log("FIREHOSE TEXT: ", post.record.text);
+        //textBoxesToRender.push(new PostTextBox(post.record.text, windowWidth + random(10, 50), random(0, windowHeight), []));
+      }
+    });
 
     // TODO we probably want this to cycle globally rather than per cycle if we're making this continuous
     for (let i = 0; i < words.length; i++) {

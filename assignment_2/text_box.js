@@ -22,7 +22,6 @@ class PostTextBox {
         this.maxWidth = textWidth(this.text);
     }
 
-
     // bug: this doesn't account for newlines in the text
     // we might need to do a loop through of the text and construct in place
     // which is probably how this works under the hood anyways
