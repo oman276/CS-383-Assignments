@@ -39,8 +39,6 @@ function setup() {
 
   // define font data for everyone
   textFont('IBM Plex Mono');
-
-  
 }
 
 function draw() {
@@ -52,8 +50,10 @@ function draw() {
   background(backgroundColor);
 
   textBoxesToRender = textBoxesToRender.filter((textBox) => !textBox.isOffScreen());
-  textBoxesToRender.forEach((textBox) => textBox.updatePosition());
-  textBoxesToRender.forEach((textBox) => textBox.displayMainText());
+  textBoxesToRender.forEach((textBox) => {
+    textBox.updatePosition();
+    textBox.displayMainText()
+  } );
   textBoxesToRender.forEach((textBox) => textBox.displayHighlightedText());
 }
 
@@ -68,14 +68,6 @@ function gotSpeech() {
     let words = audiotext.split(" ");
     let word_num = words.length;
     let div_range = windowHeight / word_num;
-
-    query.firehose("a", 10).then((posts) => {
-      for (let post of posts) {
-        post.record.text = filterText(post.record.text);
-        console.log("FIREHOSE TEXT: ", post.record.text);
-        //textBoxesToRender.push(new PostTextBox(post.record.text, windowWidth + random(10, 50), random(0, windowHeight), []));
-      }
-    });
 
     // TODO we probably want this to cycle globally rather than per cycle if we're making this continuous
     for (let i = 0; i < words.length; i++) {
@@ -97,7 +89,9 @@ function gotSpeech() {
         let post = posts[shortestPostIndex];
         textBoxesToRender.push(new PostTextBox(post.record.text, 
             windowWidth + random(10, 50), 
-            random(div_range * i, div_range * (i + 1)), [word]));
+            random(div_range * i, div_range * (i + 1)), 
+            0, // front layer
+            [word]));
       });
     }
   }
@@ -109,4 +103,19 @@ function filterText(text){
   // remove emojis
   text = text.replace(/\p{Extended_Pictographic}/gu, '');
   return text;
+}
+
+function generateCloud() {
+  let layer = [1, 2, 3].random();
+  let wordCount = int(random(5, 10));
+
+  let char = alphabet[alphabetIndex];
+  alphabetIndex = (alphabetIndex + 1) % alphabet.length;
+
+
+
+  query.firehose(char, wordCount).then((posts) => {
+    // cycle through all posts and place them at a specific starting position, set all starting speed to 
+  });
+
 }
