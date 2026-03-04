@@ -3,16 +3,16 @@ class PostTextBox {
 
     textColors = [
         color(255, 255, 255, 255), 
-        color(255, 255, 255, 200), 
-        color(255, 255, 255, 150), 
-        color(255, 255, 255, 100)
+        color(255, 255, 255, 255), 
+        color(255, 255, 255, 255), 
+        color(255, 255, 255, 255)
     ];
 
     sizeRanges = [
         [30, 15],
-        [10, 7],
-        [5, 3],
-        [2, 1]
+        [15, 12],
+        [11, 10],
+        [8, 9]
     ];
 
     constructor(text, init_x, init_y, layer, target_words = []) {
@@ -35,11 +35,9 @@ class PostTextBox {
 
         textSize(this.size);
         this.maxWidth = textWidth(this.text);
+        console.log("Text: ", this.text, " Level: ", this.layer, " MaxWidth: ", this.maxWidth);
     }
 
-    // bug: this doesn't account for newlines in the text
-    // we might need to do a loop through of the text and construct in place
-    // which is probably how this works under the hood anyways
     findTargetWords() {
         for (let targetWord of this.targetWords) {
             let index = this.text.toUpperCase().indexOf(targetWord.toUpperCase());

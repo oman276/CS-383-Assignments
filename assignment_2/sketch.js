@@ -9,6 +9,9 @@ let backgroundColorLight;
 let backgroundColorDark;
 
 let textBoxesToRender = [];
+let cloudsLevel1 = [];
+let cloudsLevel2 = [];
+let cloudsLevel3 = [];
 
 let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 let alphabetIndex = 0;
@@ -16,6 +19,11 @@ let alphabetIndex = 0;
 // cloud info
 let min_time_between_clouds = 3000;
 let max_time_between_clouds = 8000;
+let cloudTimer = 0;
+let lastCloudTime = 0;
+
+let cleanTime = 1000;
+let lastCleanTime = 0;
 
 function setup() {
   speechRec = new p5.SpeechRec("en-US", gotSpeech);
@@ -37,29 +45,66 @@ function setup() {
   backgroundColorLight = color(108, 167, 240);
   backgroundColorDark = color(39, 98, 168);
 
+  createCanvas(windowWidth, windowHeight);
+
   // define font data for everyone
   textFont('IBM Plex Mono');
+
+  cloudTimer = random(min_time_between_clouds, max_time_between_clouds);
 }
 
 function draw() {
+  // do async updates before we draw to avoid any mid-draw updates
+  let currentTime = millis();
+
+  // update the clouds
+  if (currentTime - lastCloudTime > cloudTimer) {
+    generateCloud();
+    lastCloudTime = currentTime;
+    cloudTimer = random(min_time_between_clouds, max_time_between_clouds);
+  }
+
+  // clean up text boxes that are off screen (does not need to be each frame)
+  if (currentTime - lastCleanTime > cleanTime) {
+    textBoxesToRender = textBoxesToRender.filter((textBox) => !textBox.isOffScreen());
+    cloudsLevel1 = cloudsLevel1.filter((textBox) => !textBox.isOffScreen());
+    cloudsLevel2 = cloudsLevel2.filter((textBox) => !textBox.isOffScreen());
+    cloudsLevel3 = cloudsLevel3.filter((textBox) => !textBox.isOffScreen());
+    lastCleanTime = currentTime;
+  }
+
   // get elements
   let backgroundColor = lerpColor(backgroundColorLight, backgroundColorDark, sin(frameCount * 0.005));
 
   // draw image on screen
-  createCanvas(windowWidth, windowHeight);
   background(backgroundColor);
 
-  // need to do all of these separately
-  // this sucks for performance but it is what it is for now
-  textBoxesToRender = textBoxesToRender.filter((textBox) => !textBox.isOffScreen());
+  cloudsLevel3.forEach((textBox) => {
+    textBox.updatePosition();
+    textBox.displayMainText()
+  });
+
+  cloudsLevel2.forEach((textBox) => {
+    textBox.updatePosition();
+    textBox.displayMainText()
+  });
+
+  cloudsLevel1.forEach((textBox) => {
+    textBox.updatePosition();
+    textBox.displayMainText()
+  });
+
   textBoxesToRender.forEach((textBox) => {
     textBox.updatePosition();
     textBox.displayMainText()
   } );
+
   textBoxesToRender.forEach((textBox) => textBox.displayHighlightedText());
 }
 
-function windowResized() {}
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
 
 function paramChanged(name) {}
 
@@ -108,16 +153,28 @@ function filterText(text){
 }
 
 function generateCloud() {
-  let layer = [1, 2, 3].random();
+  let layer = random([1, 2, 3]);
   let wordCount = int(random(5, 10));
 
   let char = alphabet[alphabetIndex];
   alphabetIndex = (alphabetIndex + 1) % alphabet.length;
 
+  console.log("Generating cloud at layer ", layer, " with char ", char, " and word count ", wordCount);
 
+  let baseHeight = random(0, windowHeight);
 
   query.firehose(char, wordCount).then((posts) => {
-    // cycle through all posts and place them at a specific starting position, set all starting speed to 
+    posts.forEach((post) => {
+      post.record.text = filterText(post.record.text);
+      let box = new PostTextBox(post.record.text, 
+        windowWidth/2, 
+        windowHeight/2,
+        layer, // layer
+        []); // no target words
+      
+      if (layer == 1) { cloudsLevel1.push(box); }
+      else if (layer == 2) { cloudsLevel2.push(box); }
+      else { cloudsLevel3.push(box); }
+    }); 
   });
-
 }
