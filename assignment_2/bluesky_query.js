@@ -43,19 +43,9 @@ class BlueskyQuery {
       });
       let data = await response.json();
 
-      /*
-      data.posts.forEach((post) => {
-        console.log(post.record.text + " ---- " + post.record.createdAt);
-      });
-			*/
-      // console.log(query, ": word query successful");
-
       return data.posts;
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   }
-
-  // at some point we'll also want to be able to grab from the firehose
-  // we'll also want a content filter for porn and trump
 }

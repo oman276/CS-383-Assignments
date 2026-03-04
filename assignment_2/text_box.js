@@ -18,6 +18,7 @@ class PostTextBox {
         this.speed = map(this.text.length, 0, 300, 2, 1);
 
         // We'll do any filtering in the space above
+        textSize(this.size);
         this.maxWidth = textWidth(this.text);
     }
 

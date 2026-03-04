@@ -15,7 +15,7 @@ function setup() {
   audiotext = "";
 
   speechRec.continuous = true;
-  speechRec.interimResults = false;
+  speechRec.interimResults = false; // tried, but didn't work like I wanted it to
   speechRec.start();
 
   speechRec.onEnd = () => {
@@ -46,7 +46,6 @@ function draw() {
   textBoxesToRender.forEach((textBox) => textBox.updatePosition());
   textBoxesToRender.forEach((textBox) => textBox.displayMainText());
   textBoxesToRender.forEach((textBox) => textBox.displayHighlightedText());
-  // console.log(textBoxesToRender.length, " text boxes rendering");
 }
 
 function windowResized() {}
@@ -61,14 +60,27 @@ function gotSpeech() {
     let word_num = words.length;
     let div_range = windowHeight / word_num;
 
+    // TODO we probably want this to cycle globally rather than per cycle if we're making this continuous
     for (let i = 0; i < words.length; i++) {
       let word = words[i];
-      query.query(word, 1).then((posts) => {
-        for (let post of posts) {
-          textBoxesToRender.push(new PostTextBox(filterText(post.record.text), 
+      query.query(word, 10).then((posts) => {
+        let shortestPosition = Infinity;
+        let shortestPostIndex = -1;
+        for (let j = 0; j < posts.length; j++) {
+          let post = posts[j];
+          post.record.text = filterText(post.record.text);
+          let position = post.record.text.toUpperCase().indexOf(word.toUpperCase());
+
+          if (position != -1 && position < shortestPosition) {
+            shortestPosition = position;
+            shortestPostIndex = j;
+          }
+        }
+        if (shortestPostIndex == -1) return; // do we want to do something in this scenario?
+        let post = posts[shortestPostIndex];
+        textBoxesToRender.push(new PostTextBox(post.record.text, 
             windowWidth + random(10, 50), 
             random(div_range * i, div_range * (i + 1)), [word]));
-        }
       });
     }
   }
