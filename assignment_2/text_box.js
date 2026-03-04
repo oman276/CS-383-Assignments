@@ -1,24 +1,38 @@
 class PostTextBox {
+    // we 
+
+    textColors = [
+        color(255, 255, 255, 255), 
+        color(255, 255, 255, 200), 
+        color(255, 255, 255, 150), 
+        color(255, 255, 255, 100)
+    ];
+
+    sizeRanges = [
+        [30, 15],
+        [10, 7],
+        [5, 3],
+        [2, 1]
+    ];
+
     constructor(text, init_x, init_y, layer, target_words = []) {
-        // console.log("CREATING POST TEXT BOX WITH TEXT: ", text);
         this.text = text;
-        this.textColor = color(255, 255, 255);
+        this.textColor = this.textColors[layer];
         this.highlightedTextColor = color(50, 227, 189);
 
         this.x = init_x;
         this.y = init_y;
         this.layer = layer;
 
-        this.size = map(this.text.length, 0, 300, 30, 15);
+        this.size = map(this.text.length, 0, 600, this.sizeRanges[layer][0], this.sizeRanges[layer][1]);
         this.targetWords = target_words;
         this.targetWordPositions = [];
         this.highlightedText = [];
 
         this.findTargetWords();
 
-        this.speed = map(this.text.length, 0, 300, 2, 1);
+        this.speed = map(this.text.length, 0, 600, 2, 1);
 
-        // We'll do any filtering in the space above
         textSize(this.size);
         this.maxWidth = textWidth(this.text);
     }

@@ -49,6 +49,8 @@ function draw() {
   createCanvas(windowWidth, windowHeight);
   background(backgroundColor);
 
+  // need to do all of these separately
+  // this sucks for performance but it is what it is for now
   textBoxesToRender = textBoxesToRender.filter((textBox) => !textBox.isOffScreen());
   textBoxesToRender.forEach((textBox) => {
     textBox.updatePosition();
