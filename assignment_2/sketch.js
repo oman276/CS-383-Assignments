@@ -34,7 +34,7 @@ let ambientLoopAudio;
 const ambientLoopVolume = 0.1;
 
 function preload() {
-  ambientLoopAudio = loadSound("assets/ambient_loop.mp3");
+  ambientLoopAudio = loadSound("audio/outside_loop.wav");
 }
 
 function setup() {
