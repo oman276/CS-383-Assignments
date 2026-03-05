@@ -35,6 +35,10 @@ const ambientLoopVolume = 0.1;
 
 let maxItemsStaggered = 10;
 
+
+let hasSpokenAtAll = false;
+let introTextAlpha = 255;
+
 function preload() {
   ambientLoopAudio = loadSound("audio/outside_loop.wav");
 }
@@ -57,7 +61,6 @@ function setup() {
   // Not sharing my own credentials on github. Get your own!
   query = new BlueskyQuery(BSKY_HANDLE, BSKY_PASSWORD);
 
-  // define the colors
   backgroundColorLight = color(108, 167, 240);
   backgroundColorDark = color(80, 155, 242);
 
@@ -65,7 +68,8 @@ function setup() {
 
   createCanvas(windowWidth, windowHeight);
 
-  // define font data for everyone
+  // define font data for all subsequent text rendering
+  // ie we dont need to define in the PostTextBox class
   textFont("IBM Plex Mono");
 
   cloudTimer = random(min_time_between_clouds, max_time_between_clouds);
@@ -133,6 +137,14 @@ function draw() {
   });
 
   textBoxesToRender.forEach((textBox) => textBox.displayHighlightedText());
+
+  if (!hasSpokenAtAll || introTextAlpha > 0){
+    textSize(30);
+    textStyle(NORMAL);
+    textAlign(CENTER, CENTER);
+    fill(255, 255, 255, introTextAlpha);
+    text("What's on your mind?", windowWidth / 2, windowHeight / 2); 
+  }
 }
 
 function windowResized() {
@@ -144,6 +156,15 @@ function paramChanged(name) {}
 function gotSpeechResult() {
   if (!speechRec.resultValue) return;
   if (!speechRec.resultString) return;
+
+  if (!hasSpokenAtAll) {
+    hasSpokenAtAll = true;
+    gsap.to({ alpha: introTextAlpha }, {
+      alpha: 0,
+      duration: 1,
+      onUpdate: function() { introTextAlpha = this.targets()[0].alpha; }
+    });
+  }
 
   isSpeaking = true;
 
@@ -173,7 +194,7 @@ function gotSpeech(result) {
           post.record.text = filterText(post.record.text);
           let position = post.record.text
             .toUpperCase()
-            .indexOf(word.toUpperCase());
+            .indexOf(" " + word.toUpperCase());
 
           if (position != -1 && position < shortestPosition) {
             shortestPosition = position;
@@ -220,6 +241,8 @@ function filterText(text, wordPosition = -1) {
     }
   }
 
+  text = " " + text + " "; // add some padding to help find the position of the actual substring more accurately
+
   return text;
 }
 
@@ -231,7 +254,7 @@ function generateCloud() {
   alphabetIndex = (alphabetIndex + 1) % alphabet.length;
   let baseHeight = random(0, windowHeight);
 
-  query.firehose(char, wordCount).then((posts) => {
+  query.query(char, wordCount).then((posts) => {
     posts.forEach((post) => {
       post.record.text = filterText(post.record.text);
       let box = new PostTextBox(

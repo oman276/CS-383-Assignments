@@ -58,7 +58,7 @@ class PostTextBox {
 
   findTargetWords() {
     for (let targetWord of this.targetWords) {
-      let index = this.text.toUpperCase().indexOf(targetWord.toUpperCase());
+      let index = this.text.toUpperCase().indexOf(" " + targetWord.toUpperCase());
       this.targetWordPositions.push(index);
     }
 
@@ -69,7 +69,7 @@ class PostTextBox {
       let spaces = " ".repeat(targetWordPosition);
       let substring = this.text.substring(
         targetWordPosition,
-        targetWordPosition + targetWord.length,
+        targetWordPosition + targetWord.length + 1, // to account for searching for whitespace
       );
       this.highlightedText.push(spaces + substring);
     }
@@ -82,8 +82,7 @@ class PostTextBox {
   displayMainText() {
     textSize(this.size);
     textStyle(NORMAL);
-    // wordWrap(this.text, this.maxWidth);
-
+    textAlign(LEFT, CENTER);
     fill(this.textColor);
     text(this.text, this.x, this.y);
   }
@@ -91,6 +90,7 @@ class PostTextBox {
   displayHighlightedText() {
     fill(this.highlightedTextColor);
     textSize(this.size);
+    textAlign(LEFT, CENTER);
     textStyle(BOLD);
     for (let highlightedText of this.highlightedText) {
       fill(this.highlightedTextColor);
