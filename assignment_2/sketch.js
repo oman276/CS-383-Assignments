@@ -7,6 +7,7 @@ let query;
 
 let backgroundColorLight;
 let backgroundColorDark;
+let currentBackgroundColor;
 
 let textBoxesToRender = [];
 let cloudsLevel1 = [];
@@ -27,12 +28,23 @@ let initialCloudCount = 7;
 let cleanTime = 1000;
 let lastCleanTime = 0;
 
+let isSpeaking = false;
+
+let ambientLoopAudio;
+const ambientLoopVolume = 0.1;
+
+function preload() {
+  ambientLoopAudio = loadSound("assets/ambient_loop.mp3");
+}
+
 function setup() {
-  speechRec = new p5.SpeechRec("en-US", gotSpeech);
+  // Only one SpeechRec instance can be active at a time in the browser.
+  // Use interimResults = true and distinguish interim vs. final inside the callback.
+  speechRec = new p5.SpeechRec("en-US", gotSpeechResult);
   audiotext = "";
 
   speechRec.continuous = true;
-  speechRec.interimResults = false; // tried, but didn't work like I wanted it to
+  speechRec.interimResults = true;
   speechRec.start();
 
   speechRec.onEnd = () => {
@@ -45,7 +57,9 @@ function setup() {
 
   // define the colors
   backgroundColorLight = color(108, 167, 240);
-  backgroundColorDark = color(39, 98, 168);
+  backgroundColorDark = color(80, 155, 242);
+
+  currentBackgroundColor = backgroundColorDark;
 
   createCanvas(windowWidth, windowHeight);
 
@@ -56,6 +70,9 @@ function setup() {
   for (let i = 0; i < initialCloudCount; i++) {
     generateCloud();
   }
+
+  ambientLoopAudio.setVolume(ambientLoopVolume);
+  ambientLoopAudio.loop();
 }
 
 function draw() {
@@ -81,14 +98,24 @@ function draw() {
   }
 
   // get elements
-  let backgroundColor = lerpColor(
-    backgroundColorLight,
-    backgroundColorDark,
-    sin(frameCount * 0.005),
+  // let backgroundColor = lerpColor(
+  //   backgroundColorLight,
+  //   backgroundColorDark,
+  //   sin(frameCount * 0.005),
+  // );
+
+  let targetBackgroundColor = isSpeaking
+    ? backgroundColorLight
+    : backgroundColorDark;
+
+  currentBackgroundColor = lerpColor(
+    currentBackgroundColor,
+    targetBackgroundColor,
+    0.002 * deltaTime,
   );
 
   // draw image on screen
-  background(backgroundColor);
+  background(currentBackgroundColor);
 
   cloudsLevel3.forEach((textBox) => {
     textBox.updatePosition(deltaTime);
@@ -118,6 +145,17 @@ function windowResized() {
 }
 
 function paramChanged(name) {}
+
+function gotSpeechResult() {
+  if (!speechRec.resultValue) return;
+  if (!speechRec.resultString) return;
+
+  isSpeaking = true;
+
+  if (speechRec.resultConfidence <= 0.9) return;
+  console.log("confidence: ", speechRec.resultConfidence);
+  gotSpeech();
+}
 
 function gotSpeech() {
   if (speechRec.resultValue) {
@@ -150,12 +188,13 @@ function gotSpeech() {
         textBoxesToRender.push(
           new PostTextBox(
             filterText(post.record.text, shortestPosition),
-            windowWidth + random(10, 50),
+            windowWidth,
             random(div_range * i, div_range * (i + 1)),
             0, // front layer
             [word],
           ),
         );
+        isSpeaking = false;
       });
     }
   }
@@ -172,8 +211,10 @@ function filterText(text, wordPosition = -1) {
     let endings = [
       text.indexOf(".", wordPosition),
       text.indexOf("!", wordPosition),
-      text.indexOf("?", wordPosition)
-    ].filter(i => i !== -1);
+      text.indexOf("?", wordPosition),
+      text.indexOf(" www.", wordPosition),
+      text.indexOf(" http", wordPosition),
+    ].filter((i) => i !== -1);
     let sentenceEnd = endings.length > 0 ? min(...endings) : -1;
     if (sentenceEnd != -1) {
       text = text.substring(0, sentenceEnd + 1);
@@ -189,9 +230,6 @@ function generateCloud() {
 
   let char = alphabet[alphabetIndex];
   alphabetIndex = (alphabetIndex + 1) % alphabet.length;
-
-  // console.log("Generating cloud at layer ", layer, " with char ", char, " and word count ", wordCount);
-
   let baseHeight = random(0, windowHeight);
 
   query.firehose(char, wordCount).then((posts) => {
