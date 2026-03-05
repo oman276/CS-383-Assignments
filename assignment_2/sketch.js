@@ -20,7 +20,7 @@ let alphabetIndex = 0;
 // cloud info
 // start with a set number of clouds and then generate waaaaay fewer clouds
 let min_time_between_clouds = 3000;
-let max_time_between_clouds = 10000;
+let max_time_between_clouds = 8000;
 let cloudTimer = 0;
 let lastCloudTime = 0;
 let initialCloudCount = 7;
@@ -158,10 +158,6 @@ function gotSpeechResult() {
 
 function gotSpeech(result) {
   if (result) {
-    // console.log(result);
-    // audiotext = result;
-    // let words = audiotext.split(" ");
-
     let subsetWords = result.slice(0, maxItemsStaggered);
     let word_num = subsetWords.length;
     let div_range = windowHeight / word_num;
@@ -190,7 +186,7 @@ function gotSpeech(result) {
           new PostTextBox(
             filterText(post.record.text, shortestPosition),
             windowWidth,
-            random(div_range * i, div_range * (i + 1)),
+            random(max(40, div_range * i), min(div_range * (i + 1), windowHeight - 40)),
             0, // front layer
             [word],
           ),
@@ -206,9 +202,7 @@ function gotSpeech(result) {
 }
 
 function filterText(text, wordPosition = -1) {
-  // remove newlines
   text = text.replace(/\n/g, " ");
-  // remove emojis
   text = text.replace(/\p{Extended_Pictographic}/gu, "");
 
   // trim out all sentences after the end of the first sentence with the target word
