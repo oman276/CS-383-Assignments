@@ -97,13 +97,6 @@ function draw() {
     lastCleanTime = currentTime;
   }
 
-  // get elements
-  // let backgroundColor = lerpColor(
-  //   backgroundColorLight,
-  //   backgroundColorDark,
-  //   sin(frameCount * 0.005),
-  // );
-
   let targetBackgroundColor = isSpeaking
     ? backgroundColorLight
     : backgroundColorDark;
@@ -111,7 +104,7 @@ function draw() {
   currentBackgroundColor = lerpColor(
     currentBackgroundColor,
     targetBackgroundColor,
-    0.002 * deltaTime,
+    0.01 * deltaTime,
   );
 
   // draw image on screen
@@ -168,7 +161,8 @@ function gotSpeech() {
     // TODO we probably want this to cycle globally rather than per cycle if we're making this continuous
     for (let i = 0; i < words.length; i++) {
       let word = words[i];
-      query.query(word, 20).then((posts) => {
+      let delay = i * 300; // stagger requests by 300ms to avoid burst rate limiting
+      setTimeout(() => query.query(word, 20).then((posts) => {
         let shortestPosition = Infinity;
         let shortestPostIndex = -1;
         for (let j = 0; j < posts.length; j++) {
@@ -195,7 +189,7 @@ function gotSpeech() {
           ),
         );
         isSpeaking = false;
-      });
+      }), delay);
     }
   }
 }

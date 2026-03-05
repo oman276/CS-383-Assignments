@@ -4,37 +4,47 @@ class BlueskyQuery {
   constructor(handle, appPassword) {
     this.handle = handle;
     this.appPassword = appPassword;
+    this._authPromise = null;
 
     this.authenticate();
   }
 
   async authenticate() {
-    let url = `https://bsky.social/xrpc/com.atproto.server.createSession`;
-    try {
-      let response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          identifier: this.handle,
-          password: this.appPassword,
-        }),
-      });
-      let data = await response.json();
-      if (data.accessJwt) {
-        this.accessToken = data.accessJwt;
-        console.log("Authenticated successfully");
-      } else {
-        console.error("Authentication failed:", data);
+    if (this._authPromise) return this._authPromise;
+
+    this._authPromise = (async () => {
+      let url = `https://bsky.social/xrpc/com.atproto.server.createSession`;
+      try {
+        let response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            identifier: this.handle,
+            password: this.appPassword,
+          }),
+        });
+        let data = await response.json();
+        if (data.accessJwt) {
+          this.accessToken = data.accessJwt;
+          console.log("Authenticated successfully");
+        } else {
+          console.error("Authentication failed:", data);
+        }
+      } catch (error) {
+        console.error("Error authenticating:", error);
+      } finally {
+        this._authPromise = null;
       }
-    } catch (error) {
-      console.error("Error authenticating:", error);
-    }
+    })();
+
+    return this._authPromise;
   }
 
   async query(query, limit = 10) {
     if (!this.accessToken) {
       await this.authenticate();
     }
+
 
     let specificURL = `${this.queryURL}?q=${encodeURIComponent(query)}&limit=${limit}`;
     try {
@@ -54,6 +64,7 @@ class BlueskyQuery {
     if (!this.accessToken) {
       await this.authenticate();
     }
+
     let specificURL = `${this.queryURL}?q=${encodeURIComponent(char)}&limit=${limit}&sort=latest`;
     try {
       let response = await fetch(specificURL, {
