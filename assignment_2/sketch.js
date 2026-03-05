@@ -149,7 +149,7 @@ function gotSpeech() {
         let post = posts[shortestPostIndex];
         textBoxesToRender.push(
           new PostTextBox(
-            filterText(post.record.text.shortestPosition),
+            filterText(post.record.text, shortestPosition),
             windowWidth + random(10, 50),
             random(div_range * i, div_range * (i + 1)),
             0, // front layer
