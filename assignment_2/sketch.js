@@ -167,8 +167,14 @@ function filterText(text, wordPosition = -1) {
   // remove emojis
   text = text.replace(/\p{Extended_Pictographic}/gu, "");
 
+  // trim out all sentences after the end of the first sentence with the target word
   if (wordPosition != -1) {
-    let sentenceEnd = text.indexOf(".", wordPosition);
+    let endings = [
+      text.indexOf(".", wordPosition),
+      text.indexOf("!", wordPosition),
+      text.indexOf("?", wordPosition)
+    ].filter(i => i !== -1);
+    let sentenceEnd = endings.length > 0 ? min(...endings) : -1;
     if (sentenceEnd != -1) {
       text = text.substring(0, sentenceEnd + 1);
     }
