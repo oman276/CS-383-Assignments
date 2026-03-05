@@ -33,6 +33,8 @@ let isSpeaking = false;
 let ambientLoopAudio;
 const ambientLoopVolume = 0.1;
 
+let maxItemsStaggered = 10;
+
 function preload() {
   ambientLoopAudio = loadSound("audio/outside_loop.wav");
 }
@@ -147,21 +149,26 @@ function gotSpeechResult() {
 
   if (speechRec.resultConfidence <= 0.9) return;
   console.log("confidence: ", speechRec.resultConfidence);
-  gotSpeech();
+
+  // split the result here so we only need to do it once
+  let result = speechRec.resultString.split(" ");
+
+  gotSpeech(result);
 }
 
-function gotSpeech() {
-  if (speechRec.resultValue) {
-    console.log(speechRec.resultString);
-    audiotext = speechRec.resultString;
-    let words = audiotext.split(" ");
-    let word_num = words.length;
+function gotSpeech(result) {
+  if (result) {
+    // console.log(result);
+    // audiotext = result;
+    // let words = audiotext.split(" ");
+
+    let subsetWords = result.slice(0, maxItemsStaggered);
+    let word_num = subsetWords.length;
     let div_range = windowHeight / word_num;
 
-    // TODO we probably want this to cycle globally rather than per cycle if we're making this continuous
-    for (let i = 0; i < words.length; i++) {
-      let word = words[i];
-      let delay = i * 300; // stagger requests by 300ms to avoid burst rate limiting
+    for (let i = 0; i < subsetWords.length; i++) {
+      let word = subsetWords[i];
+      let delay = i * 300; 
       setTimeout(() => query.query(word, 20).then((posts) => {
         let shortestPosition = Infinity;
         let shortestPostIndex = -1;
@@ -191,6 +198,10 @@ function gotSpeech() {
         isSpeaking = false;
       }), delay);
     }
+
+    setTimeout(() => {
+        gotSpeech(result.slice(maxItemsStaggered))
+    }, subsetWords.length * 300 + 2000); // add some extra time after the last word
   }
 }
 
