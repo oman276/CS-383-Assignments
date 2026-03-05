@@ -17,10 +17,12 @@ let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 let alphabetIndex = 0;
 
 // cloud info
-let min_time_between_clouds = 3000;
-let max_time_between_clouds = 8000;
+// start with a set number of clouds and then generate waaaaay fewer clouds
+let min_time_between_clouds = 10000;
+let max_time_between_clouds = 30000;
 let cloudTimer = 0;
 let lastCloudTime = 0;
+let initialCloudCount = 7;
 
 let cleanTime = 1000;
 let lastCleanTime = 0;
@@ -51,6 +53,9 @@ function setup() {
   textFont('IBM Plex Mono');
 
   cloudTimer = random(min_time_between_clouds, max_time_between_clouds);
+  for (let i = 0; i < initialCloudCount; i++) {
+    generateCloud();
+  }
 }
 
 function draw() {
@@ -119,7 +124,7 @@ function gotSpeech() {
     // TODO we probably want this to cycle globally rather than per cycle if we're making this continuous
     for (let i = 0; i < words.length; i++) {
       let word = words[i];
-      query.query(word, 10).then((posts) => {
+      query.query(word, 20).then((posts) => {
         let shortestPosition = Infinity;
         let shortestPostIndex = -1;
         for (let j = 0; j < posts.length; j++) {
@@ -167,8 +172,8 @@ function generateCloud() {
     posts.forEach((post) => {
       post.record.text = filterText(post.record.text);
       let box = new PostTextBox(post.record.text, 
-        windowWidth/2, 
-        windowHeight/2,
+        windowWidth + random(10, 50),
+        baseHeight + random(-50, 50),
         layer, // layer
         []); // no target words
       

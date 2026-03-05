@@ -3,22 +3,29 @@ class PostTextBox {
 
     textColors = [
         color(255, 255, 255, 255), 
-        color(255, 255, 255, 255), 
-        color(255, 255, 255, 255), 
-        color(255, 255, 255, 255)
+        color(255, 255, 255, 150), 
+        color(255, 255, 255, 100), 
+        color(255, 255, 255, 100)
     ];
 
     sizeRanges = [
         [30, 15],
-        [15, 12],
-        [11, 10],
-        [8, 9]
+        [10, 10],
+        [7, 7],
+        [4, 4]
+    ];
+
+    speedRanges = [
+        [2, 1],
+        [0.5, 0.5],
+        [0.25, 0.25],
+        [0.1, 0.1]
     ];
 
     constructor(text, init_x, init_y, layer, target_words = []) {
         this.text = text;
         this.textColor = this.textColors[layer];
-        this.highlightedTextColor = color(50, 227, 189);
+        this.highlightedTextColor = color(0, 0, 0);
 
         this.x = init_x;
         this.y = init_y;
@@ -31,7 +38,7 @@ class PostTextBox {
 
         this.findTargetWords();
 
-        this.speed = map(this.text.length, 0, 600, 2, 1);
+        this.speed = map(this.text.length, 0, 600, this.speedRanges[layer][0], this.speedRanges[layer][1]);
 
         textSize(this.size);
         this.maxWidth = textWidth(this.text);
@@ -54,13 +61,15 @@ class PostTextBox {
         }
     }
 
-    updatePosition() {
-        this.x -= this.speed;
+    updatePosition(deltaTime) {
+        this.x -= this.speed * deltaTime;
     }
 
     displayMainText(){
         textSize(this.size);
-        
+        textStyle(NORMAL);
+        // wordWrap(this.text, this.maxWidth);
+
         fill(this.textColor);
         text(this.text, this.x, this.y);
     }
@@ -68,6 +77,7 @@ class PostTextBox {
     displayHighlightedText() {
         fill(this.highlightedTextColor);
         textSize(this.size);
+        textStyle(BOLD);
         for (let highlightedText of this.highlightedText) {
             fill(this.highlightedTextColor);
             text(highlightedText, this.x, this.y);
