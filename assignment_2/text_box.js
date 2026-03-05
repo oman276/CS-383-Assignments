@@ -1,90 +1,104 @@
 class PostTextBox {
-    // we 
+  textColors = [
+    color(255, 255, 255, 255),
+    color(255, 255, 255, 150),
+    color(255, 255, 255, 100),
+    color(255, 255, 255, 100),
+  ];
 
-    textColors = [
-        color(255, 255, 255, 255), 
-        color(255, 255, 255, 150), 
-        color(255, 255, 255, 100), 
-        color(255, 255, 255, 100)
-    ];
+  sizeRanges = [
+    [30, 15],
+    [10, 10],
+    [7, 7],
+    [4, 4],
+  ];
 
-    sizeRanges = [
-        [30, 15],
-        [10, 10],
-        [7, 7],
-        [4, 4]
-    ];
+  speedRanges = [
+    [2, 1],
+    [0.5, 0.5],
+    [0.25, 0.25],
+    [0.1, 0.1],
+  ];
 
-    speedRanges = [
-        [2, 1],
-        [0.5, 0.5],
-        [0.25, 0.25],
-        [0.1, 0.1]
-    ];
+  speedMultiplier = 0.2;
 
-    constructor(text, init_x, init_y, layer, target_words = []) {
-        this.text = text;
-        this.textColor = this.textColors[layer];
-        this.highlightedTextColor = color(0, 0, 0);
+  constructor(text, init_x, init_y, layer, target_words = []) {
+    this.text = text;
+    this.textColor = this.textColors[layer];
+    this.highlightedTextColor = color(0, 0, 0);
 
-        this.x = init_x;
-        this.y = init_y;
-        this.layer = layer;
+    this.x = init_x;
+    this.y = init_y;
+    this.layer = layer;
 
-        this.size = map(this.text.length, 0, 600, this.sizeRanges[layer][0], this.sizeRanges[layer][1]);
-        this.targetWords = target_words;
-        this.targetWordPositions = [];
-        this.highlightedText = [];
+    this.size = map(
+      this.text.length,
+      0,
+      600,
+      this.sizeRanges[layer][0],
+      this.sizeRanges[layer][1],
+    );
+    this.targetWords = target_words;
+    this.targetWordPositions = [];
+    this.highlightedText = [];
 
-        this.findTargetWords();
+    this.findTargetWords();
 
-        this.speed = map(this.text.length, 0, 600, this.speedRanges[layer][0], this.speedRanges[layer][1]);
+    this.speed = map(
+      this.text.length,
+      0,
+      600,
+      this.speedRanges[layer][0],
+      this.speedRanges[layer][1],
+    );
 
-        textSize(this.size);
-        this.maxWidth = textWidth(this.text);
-        console.log("Text: ", this.text, " Level: ", this.layer, " MaxWidth: ", this.maxWidth);
+    textSize(this.size);
+    this.maxWidth = textWidth(this.text);
+  }
+
+  findTargetWords() {
+    for (let targetWord of this.targetWords) {
+      let index = this.text.toUpperCase().indexOf(targetWord.toUpperCase());
+      this.targetWordPositions.push(index);
     }
 
-    findTargetWords() {
-        for (let targetWord of this.targetWords) {
-            let index = this.text.toUpperCase().indexOf(targetWord.toUpperCase());
-            this.targetWordPositions.push(index);
-        }
-
-        for (let i = 0; i < this.targetWordPositions.length; i++) {
-            let targetWordPosition = this.targetWordPositions[i];
-            if (targetWordPosition == -1) continue; // do we want to do something in this scenario?
-            let targetWord = this.targetWords[i];
-            let spaces = " ".repeat(targetWordPosition);
-            let substring = this.text.substring(targetWordPosition, targetWordPosition + targetWord.length);
-            this.highlightedText.push(spaces + substring);
-        }
+    for (let i = 0; i < this.targetWordPositions.length; i++) {
+      let targetWordPosition = this.targetWordPositions[i];
+      if (targetWordPosition == -1) continue; // do we want to do something in this scenario?
+      let targetWord = this.targetWords[i];
+      let spaces = " ".repeat(targetWordPosition);
+      let substring = this.text.substring(
+        targetWordPosition,
+        targetWordPosition + targetWord.length,
+      );
+      this.highlightedText.push(spaces + substring);
     }
+  }
 
-    updatePosition(deltaTime) {
-        this.x -= this.speed * deltaTime;
+  updatePosition(deltaTime) {
+    this.x -= this.speed * deltaTime * this.speedMultiplier;
+  }
+
+  displayMainText() {
+    textSize(this.size);
+    textStyle(NORMAL);
+    // wordWrap(this.text, this.maxWidth);
+
+    fill(this.textColor);
+    text(this.text, this.x, this.y);
+  }
+
+  displayHighlightedText() {
+    fill(this.highlightedTextColor);
+    textSize(this.size);
+    textStyle(BOLD);
+    for (let highlightedText of this.highlightedText) {
+      fill(this.highlightedTextColor);
+      text(highlightedText, this.x, this.y);
     }
+  }
 
-    displayMainText(){
-        textSize(this.size);
-        textStyle(NORMAL);
-        // wordWrap(this.text, this.maxWidth);
-
-        fill(this.textColor);
-        text(this.text, this.x, this.y);
-    }
-
-    displayHighlightedText() {
-        fill(this.highlightedTextColor);
-        textSize(this.size);
-        textStyle(BOLD);
-        for (let highlightedText of this.highlightedText) {
-            fill(this.highlightedTextColor);
-            text(highlightedText, this.x, this.y);
-        }
-    }
-
-    isOffScreen() {
-        return this.x + this.maxWidth < 0;
-    }
+  isOffScreen() {
+    return this.x + this.maxWidth < 0;
+  }
 }

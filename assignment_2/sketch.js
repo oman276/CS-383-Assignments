@@ -18,8 +18,8 @@ let alphabetIndex = 0;
 
 // cloud info
 // start with a set number of clouds and then generate waaaaay fewer clouds
-let min_time_between_clouds = 10000;
-let max_time_between_clouds = 30000;
+let min_time_between_clouds = 3000;
+let max_time_between_clouds = 10000;
 let cloudTimer = 0;
 let lastCloudTime = 0;
 let initialCloudCount = 7;
@@ -50,7 +50,7 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
 
   // define font data for everyone
-  textFont('IBM Plex Mono');
+  textFont("IBM Plex Mono");
 
   cloudTimer = random(min_time_between_clouds, max_time_between_clouds);
   for (let i = 0; i < initialCloudCount; i++) {
@@ -71,7 +71,9 @@ function draw() {
 
   // clean up text boxes that are off screen (does not need to be each frame)
   if (currentTime - lastCleanTime > cleanTime) {
-    textBoxesToRender = textBoxesToRender.filter((textBox) => !textBox.isOffScreen());
+    textBoxesToRender = textBoxesToRender.filter(
+      (textBox) => !textBox.isOffScreen(),
+    );
     cloudsLevel1 = cloudsLevel1.filter((textBox) => !textBox.isOffScreen());
     cloudsLevel2 = cloudsLevel2.filter((textBox) => !textBox.isOffScreen());
     cloudsLevel3 = cloudsLevel3.filter((textBox) => !textBox.isOffScreen());
@@ -79,30 +81,34 @@ function draw() {
   }
 
   // get elements
-  let backgroundColor = lerpColor(backgroundColorLight, backgroundColorDark, sin(frameCount * 0.005));
+  let backgroundColor = lerpColor(
+    backgroundColorLight,
+    backgroundColorDark,
+    sin(frameCount * 0.005),
+  );
 
   // draw image on screen
   background(backgroundColor);
 
   cloudsLevel3.forEach((textBox) => {
-    textBox.updatePosition();
-    textBox.displayMainText()
+    textBox.updatePosition(deltaTime);
+    textBox.displayMainText();
   });
 
   cloudsLevel2.forEach((textBox) => {
-    textBox.updatePosition();
-    textBox.displayMainText()
+    textBox.updatePosition(deltaTime);
+    textBox.displayMainText();
   });
 
   cloudsLevel1.forEach((textBox) => {
-    textBox.updatePosition();
-    textBox.displayMainText()
+    textBox.updatePosition(deltaTime);
+    textBox.displayMainText();
   });
 
   textBoxesToRender.forEach((textBox) => {
-    textBox.updatePosition();
-    textBox.displayMainText()
-  } );
+    textBox.updatePosition(deltaTime);
+    textBox.displayMainText();
+  });
 
   textBoxesToRender.forEach((textBox) => textBox.displayHighlightedText());
 }
@@ -130,7 +136,9 @@ function gotSpeech() {
         for (let j = 0; j < posts.length; j++) {
           let post = posts[j];
           post.record.text = filterText(post.record.text);
-          let position = post.record.text.toUpperCase().indexOf(word.toUpperCase());
+          let position = post.record.text
+            .toUpperCase()
+            .indexOf(word.toUpperCase());
 
           if (position != -1 && position < shortestPosition) {
             shortestPosition = position;
@@ -139,21 +147,33 @@ function gotSpeech() {
         }
         if (shortestPostIndex == -1) return; // do we want to do something in this scenario?
         let post = posts[shortestPostIndex];
-        textBoxesToRender.push(new PostTextBox(post.record.text, 
-            windowWidth + random(10, 50), 
-            random(div_range * i, div_range * (i + 1)), 
+        textBoxesToRender.push(
+          new PostTextBox(
+            filterText(post.record.text.shortestPosition),
+            windowWidth + random(10, 50),
+            random(div_range * i, div_range * (i + 1)),
             0, // front layer
-            [word]));
+            [word],
+          ),
+        );
       });
     }
   }
 }
 
-function filterText(text){
+function filterText(text, wordPosition = -1) {
   // remove newlines
   text = text.replace(/\n/g, " ");
   // remove emojis
-  text = text.replace(/\p{Extended_Pictographic}/gu, '');
+  text = text.replace(/\p{Extended_Pictographic}/gu, "");
+
+  if (wordPosition != -1) {
+    let sentenceEnd = text.indexOf(".", wordPosition);
+    if (sentenceEnd != -1) {
+      text = text.substring(0, sentenceEnd + 1);
+    }
+  }
+
   return text;
 }
 
@@ -164,22 +184,28 @@ function generateCloud() {
   let char = alphabet[alphabetIndex];
   alphabetIndex = (alphabetIndex + 1) % alphabet.length;
 
-  console.log("Generating cloud at layer ", layer, " with char ", char, " and word count ", wordCount);
+  // console.log("Generating cloud at layer ", layer, " with char ", char, " and word count ", wordCount);
 
   let baseHeight = random(0, windowHeight);
 
   query.firehose(char, wordCount).then((posts) => {
     posts.forEach((post) => {
       post.record.text = filterText(post.record.text);
-      let box = new PostTextBox(post.record.text, 
+      let box = new PostTextBox(
+        post.record.text,
         windowWidth + random(10, 50),
         baseHeight + random(-50, 50),
         layer, // layer
-        []); // no target words
-      
-      if (layer == 1) { cloudsLevel1.push(box); }
-      else if (layer == 2) { cloudsLevel2.push(box); }
-      else { cloudsLevel3.push(box); }
-    }); 
+        [],
+      ); // no target words
+
+      if (layer == 1) {
+        cloudsLevel1.push(box);
+      } else if (layer == 2) {
+        cloudsLevel2.push(box);
+      } else {
+        cloudsLevel3.push(box);
+      }
+    });
   });
 }
