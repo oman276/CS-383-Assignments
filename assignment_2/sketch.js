@@ -110,7 +110,7 @@ function draw() {
     0.01 * deltaTime,
   );
 
-  // draw image on screen
+  // draw all images
   background(currentBackgroundColor);
 
   cloudsLevel3.forEach((textBox) => {
@@ -148,8 +148,6 @@ function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
 
-function paramChanged(name) {}
-
 function gotSpeechResult() {
   if (!speechRec.resultValue) return;
   if (!speechRec.resultString) return;
@@ -171,7 +169,6 @@ function gotSpeechResult() {
   isSpeaking = true;
 
   if (speechRec.resultConfidence <= 0.9) return;
-  console.log("confidence: ", speechRec.resultConfidence);
 
   // split the result here so we only need to do it once
   let result = speechRec.resultString.split(" ");

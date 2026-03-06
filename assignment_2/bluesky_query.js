@@ -4,15 +4,15 @@ class BlueskyQuery {
   constructor(handle, appPassword) {
     this.handle = handle;
     this.appPassword = appPassword;
-    this._authPromise = null;
+    this.authPromise = null;
 
     this.authenticate();
   }
 
   async authenticate() {
-    if (this._authPromise) return this._authPromise;
+    if (this.authPromise) return this.authPromise;
 
-    this._authPromise = (async () => {
+    this.authPromise = (async () => {
       let url = `https://bsky.social/xrpc/com.atproto.server.createSession`;
       try {
         let response = await fetch(url, {
@@ -33,11 +33,11 @@ class BlueskyQuery {
       } catch (error) {
         console.error("Error authenticating:", error);
       } finally {
-        this._authPromise = null;
+        this.authPromise = null;
       }
     })();
 
-    return this._authPromise;
+    return this.authPromise;
   }
 
   async query(query, limit = 10) {

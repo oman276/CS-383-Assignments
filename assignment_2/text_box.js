@@ -58,13 +58,15 @@ class PostTextBox {
 
   findTargetWords() {
     for (let targetWord of this.targetWords) {
-      let index = this.text.toUpperCase().indexOf(" " + targetWord.toUpperCase());
+      let index = this.text
+        .toUpperCase()
+        .indexOf(" " + targetWord.toUpperCase());
       this.targetWordPositions.push(index);
     }
 
     for (let i = 0; i < this.targetWordPositions.length; i++) {
       let targetWordPosition = this.targetWordPositions[i];
-      if (targetWordPosition == -1) continue; // do we want to do something in this scenario?
+      if (targetWordPosition == -1) continue;
       let targetWord = this.targetWords[i];
       let spaces = " ".repeat(targetWordPosition);
       let substring = this.text.substring(
