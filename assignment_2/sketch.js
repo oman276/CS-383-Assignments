@@ -35,7 +35,6 @@ const ambientLoopVolume = 0.1;
 
 let maxItemsStaggered = 10;
 
-
 let hasSpokenAtAll = false;
 let introTextAlpha = 255;
 
@@ -44,8 +43,6 @@ function preload() {
 }
 
 function setup() {
-  // Only one SpeechRec instance can be active at a time in the browser.
-  // Use interimResults = true and distinguish interim vs. final inside the callback.
   speechRec = new p5.SpeechRec("en-US", gotSpeechResult);
   audiotext = "";
 
@@ -69,7 +66,7 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
 
   // define font data for all subsequent text rendering
-  // ie we dont need to define in the PostTextBox class
+  // ie: we dont need to define in the PostTextBox class
   textFont("IBM Plex Mono");
 
   cloudTimer = random(min_time_between_clouds, max_time_between_clouds);
@@ -138,12 +135,12 @@ function draw() {
 
   textBoxesToRender.forEach((textBox) => textBox.displayHighlightedText());
 
-  if (!hasSpokenAtAll || introTextAlpha > 0){
+  if (!hasSpokenAtAll || introTextAlpha > 0) {
     textSize(30);
     textStyle(NORMAL);
     textAlign(CENTER, CENTER);
     fill(255, 255, 255, introTextAlpha);
-    text("What's on your mind?", windowWidth / 2, windowHeight / 2); 
+    text("What's on your mind?", windowWidth / 2, windowHeight / 2);
   }
 }
 
@@ -159,11 +156,16 @@ function gotSpeechResult() {
 
   if (!hasSpokenAtAll) {
     hasSpokenAtAll = true;
-    gsap.to({ alpha: introTextAlpha }, {
-      alpha: 0,
-      duration: 1,
-      onUpdate: function() { introTextAlpha = this.targets()[0].alpha; }
-    });
+    gsap.to(
+      { alpha: introTextAlpha },
+      {
+        alpha: 0,
+        duration: 1,
+        onUpdate: function () {
+          introTextAlpha = this.targets()[0].alpha;
+        },
+      },
+    );
   }
 
   isSpeaking = true;
@@ -185,40 +187,50 @@ function gotSpeech(result) {
 
     for (let i = 0; i < subsetWords.length; i++) {
       let word = subsetWords[i];
-      let delay = i * 300; 
-      setTimeout(() => query.query(word, 20).then((posts) => {
-        let shortestPosition = Infinity;
-        let shortestPostIndex = -1;
-        for (let j = 0; j < posts.length; j++) {
-          let post = posts[j];
-          post.record.text = filterText(post.record.text);
-          let position = post.record.text
-            .toUpperCase()
-            .indexOf(" " + word.toUpperCase());
+      let delay = i * 300;
+      setTimeout(
+        () =>
+          query.query(word, 20).then((posts) => {
+            let shortestPosition = Infinity;
+            let shortestPostIndex = -1;
+            for (let j = 0; j < posts.length; j++) {
+              let post = posts[j];
+              post.record.text = filterText(post.record.text);
+              let position = post.record.text
+                .toUpperCase()
+                .indexOf(" " + word.toUpperCase());
 
-          if (position != -1 && position < shortestPosition) {
-            shortestPosition = position;
-            shortestPostIndex = j;
-          }
-        }
-        if (shortestPostIndex == -1) return; // do we want to do something in this scenario?
-        let post = posts[shortestPostIndex];
-        textBoxesToRender.push(
-          new PostTextBox(
-            filterText(post.record.text, shortestPosition),
-            windowWidth,
-            random(max(40, div_range * i), min(div_range * (i + 1), windowHeight - 40)),
-            0, // front layer
-            [word],
-          ),
-        );
-        isSpeaking = false;
-      }), delay);
+              if (position != -1 && position < shortestPosition) {
+                shortestPosition = position;
+                shortestPostIndex = j;
+              }
+            }
+            if (shortestPostIndex == -1) return; // do we want to do something in this scenario?
+            let post = posts[shortestPostIndex];
+            textBoxesToRender.push(
+              new PostTextBox(
+                filterText(post.record.text, shortestPosition),
+                windowWidth,
+                random(
+                  max(40, div_range * i),
+                  min(div_range * (i + 1), windowHeight - 40),
+                ),
+                0, // front layer
+                [word],
+              ),
+            );
+            isSpeaking = false;
+          }),
+        delay,
+      );
     }
 
-    setTimeout(() => {
-        gotSpeech(result.slice(maxItemsStaggered))
-    }, subsetWords.length * 300 + 2000); // add some extra time after the last word
+    setTimeout(
+      () => {
+        gotSpeech(result.slice(maxItemsStaggered));
+      },
+      subsetWords.length * 300 + 2000,
+    ); // add some extra time after the last word
   }
 }
 
@@ -261,9 +273,9 @@ function generateCloud() {
         post.record.text,
         windowWidth + random(10, 50),
         baseHeight + random(-50, 50),
-        layer, // layer
+        layer,
         [],
-      ); // no target words
+      ); // no target words for this one
 
       if (layer == 1) {
         cloudsLevel1.push(box);

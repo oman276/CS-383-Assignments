@@ -50,8 +50,8 @@ class BlueskyQuery {
       let response = await fetch(specificURL, {
         headers: { Authorization: `Bearer ${this.accessToken}` },
       });
-      let data = await response.json();
 
+      let data = await response.json();
       return data.posts;
     } catch (error) {
       console.error("Error fetching data:", error);
