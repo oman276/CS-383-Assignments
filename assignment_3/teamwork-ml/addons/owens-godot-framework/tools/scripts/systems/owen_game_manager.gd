@@ -30,7 +30,7 @@ enum GameState {
 ## Meant to be used with my Loading utiliities, but you can implement your own loading screen logic if you want.
 
 # Loading is set to off by default. Enable if if you have the rest of the loading screen system implemented.
-var uses_loading_screen: bool = true
+@export var uses_loading_screen: bool = false
 ## This is the canvas layer that will be used for the loading screen.
 var loading_canvas: CanvasLayer = null
 
@@ -56,14 +56,14 @@ var current_level_node: Node2D = null
 # The mouse cursor scene to instantiate. Set this in the editor by dragging the scene file here.
 @export var mouse_cursor_scene: PackedScene
 # Set to true if you want to use a custom mouse cursor and have the mouse cursor setup.
-var load_custom_mouse: bool = true
+@export var load_custom_mouse: bool = false
 # The mouse cursor node to be saved here.
 var mouse_cursor: OwenMouseCursor = null
 
 # Debug Controls
 # Activate this book to allow reloading the current level with a keypress.
 # The key is defined in the input map as "reload_current_level", by default R.
-var debug_reload_level: bool = true
+@export var debug_reload_level: bool = true
 
 func _ready():
 	if uses_loading_screen:
