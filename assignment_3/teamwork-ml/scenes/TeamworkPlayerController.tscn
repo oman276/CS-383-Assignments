@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://coe2eeb7nu6ua"]
+
+[ext_resource type="PackedScene" uid="uid://dv2omdrmg3613" path="res://addons/owens-godot-framework/tools/scenes/controllers/TopDownController.tscn" id="1_b6b4y"]
+
+[node name="TeamworkPlayerController" unique_id=1717696684 instance=ExtResource("1_b6b4y")]
+
+[node name="PickupController" parent="." index="2"]
+input_enabled = false
