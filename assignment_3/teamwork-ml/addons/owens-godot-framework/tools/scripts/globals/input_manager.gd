@@ -18,11 +18,11 @@ const strict_mode: bool = false
 # This prevents warnings about missing input actions for unused control schemes.
 
 ## Whether to validate TopDown input actions on startup.
-const validate_topdown: bool = true
+const validate_topdown: bool = false
 ## Whether to validate Platformer2D input actions on startup.
-const validate_platformer: bool = true
+const validate_platformer: bool = false
 ## Whether to validate Debug input actions on startup.
-const validate_debug: bool = true
+const validate_debug: bool = false
 
 # ============================================================================
 # INPUT ACTION CONSTANTS
@@ -69,7 +69,7 @@ class TopDown:
 	static func get_movement_dir() -> Vector2:
 		return Input.get_vector(
 			MOVE_LEFT,
-			MOVE_RIGHT, 
+			MOVE_RIGHT,
 			MOVE_UP,
 			MOVE_DOWN
 		)
@@ -103,7 +103,7 @@ class Platformer2D:
 	static func get_movement_axis() -> float:
 		return Input.get_axis(
 			MOVE_LEFT,
-			MOVE_RIGHT	
+			MOVE_RIGHT
 		)
 
 
@@ -217,4 +217,3 @@ func _print_category_actions(category_name: String, actions: Array) -> void:
 	print("\n%s:" % category_name)
 	for action in actions:
 		print("  %s" % action)
-

@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://bw5la17r58bwo"]
+
+[ext_resource type="Script" uid="uid://xdtpedidagc2" path="res://scripts/systems/teamwork_game_manager.gd" id="1_xkful"]
+[ext_resource type="PackedScene" uid="uid://cmofbo13qg4di" path="res://addons/owens-godot-framework/test_game_data/scenes/test_scene.tscn" id="2_n5ctm"]
+[ext_resource type="PackedScene" uid="uid://d2ky6gyc2tbny" path="res://scenes/TestRoot.tscn" id="3_21lai"]
+
+[node name="TeamworkGameManager" type="Node2D" unique_id=1994989431]
+script = ExtResource("1_xkful")
+level_path_dict = Dictionary[String, PackedScene]({
+"": null,
+"Platformer Test Level": ExtResource("2_n5ctm"),
+"TestRoot": ExtResource("3_21lai")
+})
+initial_level = "TestRoot"

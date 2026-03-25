@@ -1,16 +1,16 @@
 extends Node
 
-var py_server : UDPServer
+var server: UDPServer
 
 func _ready() -> void:
-    py_server = UDPServer.new()
-    py_server.listen(4242)
+	server = UDPServer.new()
+	server.listen(4242)
 
-# this may allow us to ping a server 
 func _process(_delta: float) -> void:
-    if py_server.is_connection_available():
-        var packet = py_server.take_packet()
-        var data = packet.get_string_from_utf8()
-        print("Received from Python: ", data)
-        # Echo back the received data
-        py_server.send_packet(packet.get_address(), packet.get_port(), "Echo: " + data)
+	server.poll()
+	if server.is_connection_available():
+		var peer: PacketPeerUDP = server.take_connection()
+		var packet = peer.get_packet()
+		print("Received: '%s' %s:%s" % [packet.get_string_from_utf8(), peer.get_packet_ip(), peer.get_packet_port()])
+
+		peer.put_packet("Hello from Godot!".to_utf8_buffer())

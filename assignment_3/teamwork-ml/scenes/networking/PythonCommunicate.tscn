@@ -1,3 +1,6 @@
 [gd_scene format=3 uid="uid://djwq6ea7qyqah"]
 
+[ext_resource type="Script" uid="uid://cxbx6qu5mvjp5" path="res://scripts/networking/PythonCommunicate.gd" id="1_raaa7"]
+
 [node name="PythonCommunicate" type="Node" unique_id=125994074]
+script = ExtResource("1_raaa7")
