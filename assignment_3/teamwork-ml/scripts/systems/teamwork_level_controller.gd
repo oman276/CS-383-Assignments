@@ -12,6 +12,14 @@ var agents: Array[Node2D] = []
 @export var pythonQueryPort: int = 5006
 var timeSinceLastUpdate: float = 0.0
 
+enum GameState {
+    RUNNING,
+    RESETTING
+}
+
+@onready var state: GameState = GameState.RUNNING
+
+
 func _ready() -> void:
     for i in range(agentNumber):
         var agent = agentScene.instantiate()
@@ -20,6 +28,9 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+    if state == GameState.RESETTING:
+        return
+
     timeSinceLastUpdate += delta
     if timeSinceLastUpdate >= 1.0 / updatePerSecond:
         timeSinceLastUpdate = 0.0
@@ -90,6 +101,32 @@ func _update_agent() -> void:
        
 
 func reset_state() -> void:
+    state = GameState.RESETTING
     for agent in agents:
         agent.global_position = Vector2.ZERO
         agent.update_direction(Vector2.ZERO)
+    player.global_position = Vector2.ZERO
+    
+    # update the tree
+    var query_message = "rebuild"
+    var udp := PacketPeerUDP.new()
+    var bind_result := udp.bind(0)
+    if bind_result != OK:
+        push_warning("Failed to bind UDP socket for Python query")
+        return
+
+    udp.set_dest_address(pythonServerIp, pythonQueryPort)
+    udp.put_packet(query_message.to_utf8_buffer())
+
+    # Poll briefly for one response packet on this same socket.
+    var max_wait_ms := 50
+    var waited_ms := 0
+    while udp.get_available_packet_count() == 0 and waited_ms < max_wait_ms:
+        OS.delay_msec(1)
+        waited_ms += 1
+
+    if udp.get_available_packet_count() == 0:
+        udp.close()
+        return
+
+    state = GameState.RUNNING
