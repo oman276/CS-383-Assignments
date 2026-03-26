@@ -12,8 +12,7 @@ var lastPosition: Vector2 = Vector2.ZERO
 # every n frames, send the location of the player to the Python server
 func _process(delta: float) -> void:
 	timeSinceLastSend += delta
-	if timeSinceLastSend >= sendDelta:
-		var elapsed := timeSinceLastSend
+	if timeSinceLastSend >= sendDelta && player.velocity != Vector2.ZERO:
 		timeSinceLastSend = 0.0
 
 		var message = "update,%f,%f,%f,%f" % [
@@ -26,4 +25,3 @@ func _process(delta: float) -> void:
 		udp.set_dest_address("127.0.0.1", 5005)
 		udp.put_packet(message.to_utf8_buffer())
 		udp.close()
-
