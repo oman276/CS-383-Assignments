@@ -7,12 +7,9 @@ from sklearn.neighbors import KDTree
 
 print("Finished imports...")
 
-# Create one UDP socket per port and bind so we can receive packets.
 updates_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 query_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-# On Windows, replying to short-lived UDP clients can surface WSAECONNRESET
-# on recvfrom unless this flag is disabled.
 for udp_socket in (updates_socket, query_socket):
     try:
         udp_socket.ioctl(socket.SIO_UDP_CONNRESET, False)
@@ -31,6 +28,12 @@ kd_tree_size = 0
 kd_tree_dirty = False
 last_positional_update = None
 
+current_round = 1
+
+# debug variables
+weigh_recency = True
+weigh_proximity = True
+cull_after = -1 # if -1, do not need to cull any from tree
 
 def parse_message(raw_data):
     decoded = raw_data.decode().strip()
@@ -41,7 +44,7 @@ def parse_message(raw_data):
 def format_velocity_response(nearest_velocities):
     if not nearest_velocities:
         return ""
-    return ";".join(f"{vx},{vy}" for vx, vy in nearest_velocities)
+    return ";".join(f"{vx},{vy},{round}" for vx, vy, round in nearest_velocities)
 
 
 def _can_parse_float(value):
@@ -54,8 +57,10 @@ def _can_parse_float(value):
 
 def _add_position_velocity(x, y, vel_x, vel_y):
     global kd_tree_dirty
+    # we apply the current round as a sort of timestamp
+    # we will weigh recency to determine the weight of the points
     positions.append((x, y))
-    velocities.append((vel_x, vel_y))
+    velocities.append((vel_x, vel_y, current_round))
     kd_tree_dirty = True
 
 
@@ -78,9 +83,8 @@ def _is_kd_tree_ready_for_query():
     # Queries can keep using the last explicitly rebuilt tree, even if dirty.
     return kd_tree is not None and kd_tree_size > 0
 
-
 def handle_action(parts):
-    global kd_tree, kd_tree_size, kd_tree_dirty, last_positional_update
+    global kd_tree, kd_tree_size, kd_tree_dirty, last_positional_update, current_round
 
     if not parts:
         return "error,empty message"
@@ -108,6 +112,9 @@ def handle_action(parts):
     if action == "rebuild":
         if not _ensure_kd_tree():
             return "error,no positions available"
+        
+        # update the current round
+        current_round += 1
         return "ok,rebuilt"
 
     if action == "query":
@@ -131,6 +138,7 @@ def handle_action(parts):
         k = min(k, kd_tree_size)
         _, indices = kd_tree.query([[query_x, query_y]], k=k)
         nearest_velocities = [velocities[index] for index in indices[0]]
+        # response format: "ok,agent_index,velX1,velY1,round1;velX2,velY2,round2;..."
         return f"ok,{agent_index},{format_velocity_response(nearest_velocities)}"
 
     # malformed message

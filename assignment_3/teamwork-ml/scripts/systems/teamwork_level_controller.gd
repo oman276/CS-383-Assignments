@@ -15,6 +15,12 @@ var timeSinceLastUpdate: float = 0.0
 # Pending UDP requests: array of {socket, agent_index}
 var pending_requests: Array = []
 
+var current_round: int = 1
+
+# debug variables
+var weigh_recency: bool = true
+var weigh_proximity: bool = true
+
 
 func _ready() -> void:
 	for i in range(agentNumber):
@@ -68,7 +74,6 @@ func _poll_pending_requests() -> void:
 	for i in range(pending_requests.size()):
 		var request = pending_requests[i]
 		var udp = request["socket"]
-		var agentIndex = request["agent_index"]
 		
 		if udp.get_available_packet_count() > 0:
 			var response = udp.get_packet().get_string_from_utf8().strip_edges()
@@ -83,6 +88,7 @@ func _poll_pending_requests() -> void:
 
 				var response_agent_index = parts[0].to_int()
 				if response_agent_index < 0 or response_agent_index >= agents.size():
+					print("Received response for invalid agent index: %d" % response_agent_index)
 					continue
 
 				var velocity_entries = []
@@ -95,12 +101,14 @@ func _poll_pending_requests() -> void:
 
 				for entry in velocity_entries:
 					var vel_parts = entry.split(",", false)
-					if vel_parts.size() != 2:
+					if vel_parts.size() != 3:
+						print("Malformed velocity entry (weird num of components): '%s'" % entry)
 						continue
 
 					var vel_x = vel_parts[0].to_float()
 					var vel_y = vel_parts[1].to_float()
-					sum_velocity += Vector2(vel_x, vel_y)
+					var result_round = vel_parts[2].to_int() if vel_parts.size() > 2 else 0
+					sum_velocity += _round_weighted_velocity(Vector2(vel_x, vel_y), result_round)
 					count += 1
 
 				if count == 0:
@@ -115,7 +123,13 @@ func _poll_pending_requests() -> void:
 	for i in range(requests_to_remove.size() - 1, -1, -1):
 		pending_requests.remove_at(requests_to_remove[i])
 	   
+func _round_weighted_velocity(velocity: Vector2, result_round: int) -> Vector2:
+	# we could fiddle with this decay factor but I think this works for now
+	var round_difference = current_round - result_round
+	var decay_factor = 1.0 / (1.0 + round_difference) if weigh_recency else 1.0
+	return velocity * decay_factor
 
+# this starts a new round, incrementing our request systems
 func reset_state() -> void:
 	print("Resetting state...")
 
@@ -127,9 +141,9 @@ func reset_state() -> void:
 	pending_requests.clear()
 	
 	for agent in agents:
-		agent.global_position = Vector2.ZERO
-		agent.update_direction(Vector2.ZERO)
+		agent.reset()
 	player.global_position = Vector2.ZERO
+	current_round += 1
 	
 	# update the tree
 	var query_message = "rebuild"
