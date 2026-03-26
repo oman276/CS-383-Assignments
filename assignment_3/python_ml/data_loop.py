@@ -168,6 +168,13 @@ def handle_action(parts):
 
 print("Starting server...")
 
+# initialize the tree with initial starting values at 0,0 so we get sent in random directions
+# at the start instead of being so locked in
+positions.append([(0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0)])
+velocities.append([(0.0, 1.0, current_round), (0.0, -1.0, current_round), 
+                   (1.0, 0.0, current_round), (-1.0, 0.0, current_round)])
+_ensure_kd_tree()
+
 while True:
     readable, _, _ = select.select(sockets_to_listen, [], [])
     print("Received data on a port")

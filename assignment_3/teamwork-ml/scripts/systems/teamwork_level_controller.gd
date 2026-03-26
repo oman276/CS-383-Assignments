@@ -148,7 +148,6 @@ func reset_state() -> void:
 	
 	for agent in agents:
 		agent.reset()
-	# player.global_position = Vector2.ZERO
 	current_round += 1
 	
 	# update the tree
