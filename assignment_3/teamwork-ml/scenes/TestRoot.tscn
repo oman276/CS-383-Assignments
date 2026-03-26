@@ -5,9 +5,12 @@
 [ext_resource type="PackedScene" uid="uid://dnei0go0sxghg" path="res://scenes/MLAgent.tscn" id="2_okul0"]
 [ext_resource type="PackedScene" uid="uid://coe2eeb7nu6ua" path="res://scenes/TeamworkPlayerController.tscn" id="3_o3x8r"]
 
-[node name="TestRoot" type="Node2D" unique_id=348076594]
+[node name="TestRoot" type="Node2D" unique_id=348076594 node_paths=PackedStringArray("player")]
 script = ExtResource("1_o3x8r")
+player = NodePath("TeamworkPlayerController")
 agentScene = ExtResource("2_okul0")
+agentNumber = 3
+updatePerSecond = 5
 
 [node name="OwenCamera" parent="." unique_id=1808773620 node_paths=PackedStringArray("target") instance=ExtResource("1_nuy52")]
 target = NodePath("../TargetPosition")

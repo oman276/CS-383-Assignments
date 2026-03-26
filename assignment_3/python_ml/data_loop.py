@@ -11,6 +11,14 @@ print("Finished imports...")
 updates_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 query_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
+# On Windows, replying to short-lived UDP clients can surface WSAECONNRESET
+# on recvfrom unless this flag is disabled.
+for udp_socket in (updates_socket, query_socket):
+    try:
+        udp_socket.ioctl(socket.SIO_UDP_CONNRESET, False)
+    except (AttributeError, OSError):
+        pass
+
 updates_socket.bind((SERVER_IP, UPDATES_PORT))
 query_socket.bind((SERVER_IP, QUERY_PORT))
 
@@ -19,6 +27,8 @@ sockets_to_listen = [updates_socket, query_socket]
 positions = []
 velocities = []
 kd_tree = None
+kd_tree_dirty = False
+last_positional_update = None
 
 
 def parse_message(raw_data):
@@ -33,11 +43,41 @@ def format_velocity_response(nearest_velocities):
     return ";".join(f"{vx},{vy}" for vx, vy in nearest_velocities)
 
 
+def _can_parse_float(value):
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
+
+
+def _add_position_velocity(x, y, vel_x, vel_y):
+    global kd_tree_dirty
+    positions.append((x, y))
+    velocities.append((vel_x, vel_y))
+    kd_tree_dirty = True
+
+
+def _ensure_kd_tree():
+    global kd_tree, kd_tree_dirty
+    if not positions:
+        kd_tree = None
+        return False
+
+    if kd_tree is None or kd_tree_dirty:
+        kd_tree = KDTree(positions)
+        kd_tree_dirty = False
+
+    return True
+
+
 def handle_action(parts):
-    global kd_tree
+    global kd_tree, kd_tree_dirty, last_positional_update
 
     if not parts:
         return "error,empty message"
+
+    # we should be sending more explicit messages from Godot, we should error if we recieve malformed messages
 
     action = parts[0].lower()
 
@@ -54,29 +94,27 @@ def handle_action(parts):
         except ValueError:
             return "error,update values must be numeric"
 
-        positions.append((x, y))
-        velocities.append((vel_x, vel_y))
+        _add_position_velocity(x, y, vel_x, vel_y)
         print(f"added position ({x}, {y}) and velocity ({vel_x}, {vel_y})")
         return "ok,updated"
 
     if action == "rebuild":
-        if not positions:
+        if not _ensure_kd_tree():
             return "error,no positions available"
-
-        kd_tree = KDTree(positions)
         return "ok,rebuilt"
 
     if action == "query":
-        if len(parts) < 4:
-            return "error,query requires: query,x,y,k"
+        if len(parts) < 5:
+            return "error,query requires: query,x,y,k,agent_index"
 
-        if kd_tree is None:
-            return "error,kd tree not built"
+        if not _ensure_kd_tree():
+            return "error,no positions available"
 
         try:
             query_x = float(parts[1])
             query_y = float(parts[2])
             k = int(parts[3])
+            agent_index = int(parts[4])
         except ValueError:
             return "error,query values must be numeric"
 
@@ -86,8 +124,11 @@ def handle_action(parts):
         k = min(k, len(positions))
         _, indices = kd_tree.query([[query_x, query_y]], k=k)
         nearest_velocities = [velocities[index] for index in indices[0]]
-        return f"ok,{format_velocity_response(nearest_velocities)}"
+        return f"ok,{agent_index},{format_velocity_response(nearest_velocities)}"
 
+    # malformed message
+    print(f"Received malformed message: {decoded}")
+    assert False, "Received malformed message" 
     return f"error,unknown action: {action}"
 
 
@@ -101,7 +142,11 @@ while True:
     readable, _, _ = select.select(sockets_to_listen, [], [])
     print("Received data on a port")
     for sock in readable:
-        data, addr = sock.recvfrom(1024)
+        try:
+            data, addr = sock.recvfrom(1024)
+        except ConnectionResetError as err:
+            print(f"recvfrom reset by peer, continuing: {err}")
+            continue
         decoded, parts = parse_message(data)
         response = handle_action(parts)
 

@@ -12,12 +12,8 @@ var agents: Array[Node2D] = []
 @export var pythonQueryPort: int = 5006
 var timeSinceLastUpdate: float = 0.0
 
-enum GameState {
-	RUNNING,
-	RESETTING
-}
-
-@onready var state: GameState = GameState.RUNNING
+# Pending UDP requests: array of {socket, agent_index}
+var pending_requests: Array = []
 
 
 func _ready() -> void:
@@ -26,10 +22,12 @@ func _ready() -> void:
 		get_parent().add_child(agent)
 		agents.append(agent)
 
-
 func _process(delta: float) -> void:
-	if state == GameState.RESETTING:
+	if GameManager.tm_state == GameManager.TeamworkGameState.RESETTING:
 		return
+
+	# Poll all pending UDP requests for responses
+	_poll_pending_requests()
 
 	timeSinceLastUpdate += delta
 	if timeSinceLastUpdate >= 1.0 / updatePerSecond:
@@ -41,12 +39,13 @@ func _process(delta: float) -> void:
 
 func _update_agent() -> void:
 	if agents.is_empty():
-			return
+		return
 
 	# pick a random agent
-	var agent = agents[randi() % agents.size()]
+	var agentIndex = randi() % agents.size()
+	var agent = agents[agentIndex]
 	# request a new velocity for that agent from the Python server
-	var query_message = "query,%f,%f,%d" % [agent.global_position.x, agent.global_position.y, queryNeighborCount]
+	var query_message = "query,%f,%f,%d,%d" % [agent.global_position.x, agent.global_position.y, queryNeighborCount, agentIndex]
 	var udp := PacketPeerUDP.new()
 	var bind_result := udp.bind(0)
 	if bind_result != OK:
@@ -55,55 +54,78 @@ func _update_agent() -> void:
 
 	udp.set_dest_address(pythonServerIp, pythonQueryPort)
 	udp.put_packet(query_message.to_utf8_buffer())
+	
+	# Store this socket and agent index for polling later
+	pending_requests.append({
+		"socket": udp,
+		"agent_index": agentIndex
+	})
 
-	# Poll briefly for one response packet on this same socket.
-	var max_wait_ms := 50
-	var waited_ms := 0
-	while udp.get_available_packet_count() == 0 and waited_ms < max_wait_ms:
-		OS.delay_msec(1)
-		waited_ms += 1
 
-	if udp.get_available_packet_count() == 0:
-		udp.close()
-		return
+func _poll_pending_requests() -> void:
+	var requests_to_remove = []
+	
+	for i in range(pending_requests.size()):
+		var request = pending_requests[i]
+		var udp = request["socket"]
+		var agentIndex = request["agent_index"]
+		
+		if udp.get_available_packet_count() > 0:
+			var response = udp.get_packet().get_string_from_utf8().strip_edges()
+			udp.close()
+			requests_to_remove.append(i)
+			
+			# Process the response
+			if response.begins_with("ok,"):
+				var parts = response.substr(3).split(",", false)
+				if parts.size() < 1:
+					continue
 
-	var response = udp.get_packet().get_string_from_utf8().strip_edges()
-	udp.close()
+				var response_agent_index = parts[0].to_int()
+				if response_agent_index < 0 or response_agent_index >= agents.size():
+					continue
 
-	if not response.begins_with("ok,"):
-		return
+				var velocity_entries = []
+				if parts.size() > 1:
+					var velocity_string = ",".join(parts.slice(1))
+					velocity_entries = velocity_string.split(";", false)
 
-	var velocity_blob = response.substr(3)
-	if velocity_blob.is_empty():
-		return
+				var sum_velocity = Vector2.ZERO
+				var count = 0
 
-	var velocity_entries = velocity_blob.split(";", false)
-	var sum_velocity = Vector2.ZERO
-	var count = 0
+				for entry in velocity_entries:
+					var vel_parts = entry.split(",", false)
+					if vel_parts.size() != 2:
+						continue
 
-	for entry in velocity_entries:
-		var parts = entry.split(",", false)
-		if parts.size() != 2:
-			continue
+					var vel_x = vel_parts[0].to_float()
+					var vel_y = vel_parts[1].to_float()
+					sum_velocity += Vector2(vel_x, vel_y)
+					count += 1
 
-		var vel_x = parts[0].to_float()
-		var vel_y = parts[1].to_float()
-		sum_velocity += Vector2(vel_x, vel_y)
-		count += 1
+				if count == 0:
+					continue
 
-	if count == 0:
-		return
-
-	var average_velocity = sum_velocity / float(count)
-	# change the agent's velocity based on the average of all velocities in the response
-	if agent.has_method("update_direction"):
-		agent.update_direction(average_velocity)
+				var average_velocity = sum_velocity / float(count)
+				var agent = agents[response_agent_index]
+				if agent.has_method("update_direction"):
+					agent.update_direction(average_velocity)
+	
+	# Remove completed requests in reverse order to maintain indices
+	for i in range(requests_to_remove.size() - 1, -1, -1):
+		pending_requests.remove_at(requests_to_remove[i])
 	   
 
 func reset_state() -> void:
 	print("Resetting state...")
 
-	state = GameState.RESETTING
+	GameManager.tm_state = GameManager.TeamworkGameState.RESETTING
+	
+	# Close all pending UDP requests
+	for request in pending_requests:
+		request["socket"].close()
+	pending_requests.clear()
+	
 	for agent in agents:
 		agent.global_position = Vector2.ZERO
 		agent.update_direction(Vector2.ZERO)
@@ -115,6 +137,8 @@ func reset_state() -> void:
 	var bind_result := udp.bind(0)
 	if bind_result != OK:
 		push_warning("Failed to bind UDP socket for Python query")
+		print("Failed to bind UDP socket for Python query")
+		GameManager.tm_state = GameManager.TeamworkGameState.RUNNING
 		return
 
 	udp.set_dest_address(pythonServerIp, pythonQueryPort)
@@ -128,7 +152,8 @@ func reset_state() -> void:
 		waited_ms += 1
 
 	if udp.get_available_packet_count() == 0:
+		print("No response received for reset query... :(")
 		udp.close()
-		return
 
-	state = GameState.RUNNING
+	print("reset done")
+	GameManager.tm_state = GameManager.TeamworkGameState.RUNNING
