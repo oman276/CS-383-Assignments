@@ -1,8 +1,13 @@
 [gd_scene format=3 uid="uid://coe2eeb7nu6ua"]
 
 [ext_resource type="PackedScene" uid="uid://dv2omdrmg3613" path="res://addons/owens-godot-framework/tools/scenes/controllers/TopDownController.tscn" id="1_b6b4y"]
+[ext_resource type="Script" uid="uid://dq6yryiwjhcl8" path="res://scripts/networking/python_send_location.gd" id="2_2txiu"]
 
 [node name="TeamworkPlayerController" unique_id=1717696684 instance=ExtResource("1_b6b4y")]
 
 [node name="PickupController" parent="." index="2"]
 input_enabled = false
+
+[node name="Location Sender" type="Node2D" parent="." index="3" unique_id=887328381]
+script = ExtResource("2_2txiu")
+sendPerSecond = 3

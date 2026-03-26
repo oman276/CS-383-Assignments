@@ -1,15 +1,12 @@
 [gd_scene format=3 uid="uid://d2ky6gyc2tbny"]
 
 [ext_resource type="PackedScene" uid="uid://blq7187l5a4s7" path="res://addons/owens-godot-framework/tools/scenes/level-elements/OwenCamera.tscn" id="1_nuy52"]
-[ext_resource type="PackedScene" uid="uid://djwq6ea7qyqah" path="res://scenes/networking/PythonCommunicate.tscn" id="2_gjfi1"]
 [ext_resource type="PackedScene" uid="uid://coe2eeb7nu6ua" path="res://scenes/TeamworkPlayerController.tscn" id="3_o3x8r"]
 
 [node name="TestRoot" type="Node2D" unique_id=348076594]
 
 [node name="OwenCamera" parent="." unique_id=1808773620 node_paths=PackedStringArray("target") instance=ExtResource("1_nuy52")]
 target = NodePath("../TargetPosition")
-
-[node name="PythonCommunicate" parent="." unique_id=125994074 instance=ExtResource("2_gjfi1")]
 
 [node name="TargetPosition" type="Node2D" parent="." unique_id=839304012]
 
