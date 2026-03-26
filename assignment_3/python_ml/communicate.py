@@ -1,6 +1,8 @@
 import socket
 from constants import SERVER_IP, SERVER_PORT
 
+# one time communication
+
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 client_socket.settimeout(1)
 
