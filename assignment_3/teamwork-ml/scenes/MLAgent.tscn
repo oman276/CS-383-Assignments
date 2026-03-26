@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://dnei0go0sxghg"]
+
+[ext_resource type="Script" uid="uid://dpybhg817da1f" path="res://scripts/agent.gd" id="1_f8s4n"]
+[ext_resource type="Texture2D" uid="uid://chwf4kwqf4chx" path="res://addons/owens-godot-framework/tools/assets/basic_colors.png" id="1_nt522"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_f8s4n"]
+
+[node name="MlAgent" type="CharacterBody2D" unique_id=454448767]
+script = ExtResource("1_f8s4n")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1903601355]
+shape = SubResource("RectangleShape2D_f8s4n")
+
+[node name="Sprite2D" type="Sprite2D" parent="CollisionShape2D" unique_id=266610309]
+modulate = Color(1, 1, 1, 0.38431373)
+texture_filter = 1
+position = Vector2(-9.536743e-07, -9.536743e-07)
+scale = Vector2(20, 20)
+texture = ExtResource("1_nt522")
+region_enabled = true
+region_rect = Rect2(0, 4, 1, 1)

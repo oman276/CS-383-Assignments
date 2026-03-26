@@ -1,8 +1,11 @@
+print("Starting imports...")
+
 import socket
 from constants import SERVER_IP, UPDATES_PORT, QUERY_PORT
 import select
 from sklearn.neighbors import KDTree
 
+print("Finished imports...")
 
 # Create one UDP socket per port and bind so we can receive packets.
 updates_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -39,6 +42,7 @@ def handle_action(parts):
     action = parts[0].lower()
 
     if action == "update":
+        print("Handling update action")
         if len(parts) < 5:
             return "error,update requires: update,x,y,velX,velY"
 
@@ -52,6 +56,7 @@ def handle_action(parts):
 
         positions.append((x, y))
         velocities.append((vel_x, vel_y))
+        print(f"added position ({x}, {y}) and velocity ({vel_x}, {vel_y})")
         return "ok,updated"
 
     if action == "rebuild":
