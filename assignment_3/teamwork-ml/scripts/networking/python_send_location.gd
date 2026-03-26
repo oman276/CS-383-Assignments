@@ -14,6 +14,7 @@ func _process(delta: float) -> void:
 	timeSinceLastSend += delta
 	if timeSinceLastSend >= sendDelta && player.velocity != Vector2.ZERO:
 		timeSinceLastSend = 0.0
+		print("sending velocity update to Python server: %s" % player.velocity)
 
 		var message = "update,%f,%f,%f,%f" % [
 			global_position.x,

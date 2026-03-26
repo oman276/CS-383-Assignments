@@ -27,6 +27,7 @@ sockets_to_listen = [updates_socket, query_socket]
 positions = []
 velocities = []
 kd_tree = None
+kd_tree_size = 0
 kd_tree_dirty = False
 last_positional_update = None
 
@@ -59,26 +60,32 @@ def _add_position_velocity(x, y, vel_x, vel_y):
 
 
 def _ensure_kd_tree():
-    global kd_tree, kd_tree_dirty
+    global kd_tree, kd_tree_size, kd_tree_dirty
     if not positions:
         kd_tree = None
+        kd_tree_size = 0
         return False
 
     if kd_tree is None or kd_tree_dirty:
         kd_tree = KDTree(positions)
+        kd_tree_size = len(positions)
         kd_tree_dirty = False
 
     return True
 
 
+def _is_kd_tree_ready_for_query():
+    # Queries can keep using the last explicitly rebuilt tree, even if dirty.
+    return kd_tree is not None and kd_tree_size > 0
+
+
 def handle_action(parts):
-    global kd_tree, kd_tree_dirty, last_positional_update
+    global kd_tree, kd_tree_size, kd_tree_dirty, last_positional_update
 
     if not parts:
         return "error,empty message"
 
     # we should be sending more explicit messages from Godot, we should error if we recieve malformed messages
-
     action = parts[0].lower()
 
     if action == "update":
@@ -107,8 +114,8 @@ def handle_action(parts):
         if len(parts) < 5:
             return "error,query requires: query,x,y,k,agent_index"
 
-        if not _ensure_kd_tree():
-            return "error,no positions available"
+        if not _is_kd_tree_ready_for_query():
+            return "error,no rebuilt kd_tree available; send rebuild"
 
         try:
             query_x = float(parts[1])
@@ -121,7 +128,7 @@ def handle_action(parts):
         if k <= 0:
             return "error,k must be > 0"
 
-        k = min(k, len(positions))
+        k = min(k, kd_tree_size)
         _, indices = kd_tree.query([[query_x, query_y]], k=k)
         nearest_velocities = [velocities[index] for index in indices[0]]
         return f"ok,{agent_index},{format_velocity_response(nearest_velocities)}"

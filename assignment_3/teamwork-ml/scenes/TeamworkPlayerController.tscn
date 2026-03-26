@@ -10,4 +10,4 @@ input_enabled = false
 
 [node name="Location Sender" type="Node2D" parent="." index="3" unique_id=887328381]
 script = ExtResource("2_2txiu")
-sendPerSecond = 3
+sendPerSecond = 30
