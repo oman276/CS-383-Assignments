@@ -33,7 +33,7 @@ current_round = 1
 # debug variables
 weigh_recency = True
 weigh_proximity = True
-cull_after = -1 # if -1, do not need to cull any from tree
+cull_after = 10 # if -1, do not need to cull any from tree
 
 def parse_message(raw_data):
     decoded = raw_data.decode().strip()
@@ -66,9 +66,24 @@ def _add_position_velocity(x, y, vel_x, vel_y):
 
 def _ensure_kd_tree():
     global kd_tree, kd_tree_size, kd_tree_dirty
+
+    if cull_after >= 0:
+        min_round = current_round - cull_after
+        filtered_entries = [
+            (pos, vel)
+            for pos, vel in zip(positions, velocities)
+            if vel[2] >= min_round
+        ]
+
+        if len(filtered_entries) != len(positions):
+            positions[:] = [pos for pos, _ in filtered_entries]
+            velocities[:] = [vel for _, vel in filtered_entries]
+            kd_tree_dirty = True
+
     if not positions:
         kd_tree = None
         kd_tree_size = 0
+        kd_tree_dirty = False
         return False
 
     if kd_tree is None or kd_tree_dirty:

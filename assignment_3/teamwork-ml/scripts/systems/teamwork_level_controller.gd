@@ -28,6 +28,8 @@ func _ready() -> void:
 		get_parent().add_child(agent)
 		agents.append(agent)
 
+	
+
 func _process(delta: float) -> void:
 	if GameManager.tm_state == GameManager.TeamworkGameState.RESETTING:
 		return
@@ -99,6 +101,10 @@ func _poll_pending_requests() -> void:
 				var sum_velocity = Vector2.ZERO
 				var count = 0
 
+				# some schochastic culling to get more interesting movement patterns
+				#velocity_entries.shuffle()
+				#velocity_entries = velocity_entries.slice(0, velocity_entries.size()/2)
+
 				for entry in velocity_entries:
 					var vel_parts = entry.split(",", false)
 					if vel_parts.size() != 3:
@@ -142,7 +148,7 @@ func reset_state() -> void:
 	
 	for agent in agents:
 		agent.reset()
-	player.global_position = Vector2.ZERO
+	# player.global_position = Vector2.ZERO
 	current_round += 1
 	
 	# update the tree

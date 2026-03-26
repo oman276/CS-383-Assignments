@@ -10,6 +10,8 @@ var direction: Vector2 = Vector2.ZERO
 @onready var randColor = Color(randf(), randf(), randf(), 0.5)
 var path_line: Line2D
 
+@export var lineWidth: float = 5.0
+
 #eventually have us pass in the color from above so we're painting something new every time
 func _ready() -> void:
     var sprite : Sprite2D = $CollisionShape2D/Sprite2D
@@ -18,7 +20,7 @@ func _ready() -> void:
 
     path_line = Line2D.new()
     path_line.default_color = randColor
-    path_line.width = 2.0
+    path_line.width = lineWidth
     path_line.z_index = -1
     path_line.top_level = true
     add_child(path_line)
