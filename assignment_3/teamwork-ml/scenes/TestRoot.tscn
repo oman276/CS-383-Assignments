@@ -9,8 +9,8 @@
 script = ExtResource("1_o3x8r")
 player = NodePath("TeamworkPlayerController")
 agentScene = ExtResource("2_okul0")
-agentNumber = 10
-updatePerSecond = 15
+agentNumber = 7
+updatePerSecond = 30
 queryNeighborCount = 6
 
 [node name="OwenCamera" parent="." unique_id=1808773620 node_paths=PackedStringArray("target") instance=ExtResource("1_nuy52")]
