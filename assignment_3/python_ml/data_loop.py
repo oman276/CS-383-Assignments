@@ -170,9 +170,9 @@ print("Starting server...")
 
 # initialize the tree with initial starting values at 0,0 so we get sent in random directions
 # at the start instead of being so locked in
-positions.append([(0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0)])
-velocities.append([(0.0, 1.0, current_round), (0.0, -1.0, current_round), 
-                   (1.0, 0.0, current_round), (-1.0, 0.0, current_round)])
+positions = [(0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0)]
+velocities = [(0.0, 1.0, current_round), (0.0, -1.0, current_round), 
+                   (1.0, 0.0, current_round), (-1.0, 0.0, current_round)]
 _ensure_kd_tree()
 
 while True:

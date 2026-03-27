@@ -13,11 +13,11 @@ func _process(delta: float) -> void:
 	timeSinceLastSend += delta
 
 	if Input.is_action_just_released("mouse"):
-		print("mouse up")
+		#print("mouse up")
 		hasStartPosition = false
 
 	elif Input.is_action_just_pressed("mouse"):
-		print("mouse down")
+		#print("mouse down")
 		# start recording mouse positions
 		hasStartPosition = true
 		lastMousePosition = get_global_mouse_position()
@@ -26,11 +26,11 @@ func _process(delta: float) -> void:
 		var currentMousePosition = get_global_mouse_position()
 		var direction = currentMousePosition - lastMousePosition
 		if direction != Vector2.ZERO:
-			print("sending velocity update to Python server: %s" % direction)
+			#print("sending velocity update to Python server: %s" % direction)
 
 			var message = "update,%f,%f,%f,%f" % [
-				global_position.x,
-				global_position.y,
+				currentMousePosition.x,
+				currentMousePosition.y,
 				direction.x,
 				direction.y
 			]

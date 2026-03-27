@@ -3,6 +3,8 @@
 [ext_resource type="PackedScene" uid="uid://blq7187l5a4s7" path="res://addons/owens-godot-framework/tools/scenes/level-elements/OwenCamera.tscn" id="1_nuy52"]
 [ext_resource type="Script" uid="uid://ryts6mu5e8sa" path="res://scripts/systems/teamwork_level_controller.gd" id="1_o3x8r"]
 [ext_resource type="PackedScene" uid="uid://dnei0go0sxghg" path="res://scenes/MLAgent.tscn" id="2_okul0"]
+[ext_resource type="Script" uid="uid://eb50mk6bwf48" path="res://scripts/networking/python_send_mouse.gd" id="4_okul0"]
+[ext_resource type="PackedScene" uid="uid://clhmiv7gjbpgp" path="res://scenes/level_elements/Barrier.tscn" id="5_mgp4m"]
 
 [node name="TestRoot" type="Node2D" unique_id=348076594 node_paths=PackedStringArray("player")]
 script = ExtResource("1_o3x8r")
@@ -16,3 +18,27 @@ queryNeighborCount = 10
 target = NodePath("../TargetPosition")
 
 [node name="TargetPosition" type="Node2D" parent="." unique_id=839304012]
+
+[node name="Mouse Tracker" type="Node2D" parent="." unique_id=1093558251]
+script = ExtResource("4_okul0")
+sendPerSecond = 30
+
+[node name="Outer Walls" type="Node2D" parent="." unique_id=1860079217]
+
+[node name="Barrier" parent="Outer Walls" unique_id=958169156 instance=ExtResource("5_mgp4m")]
+position = Vector2(-817.99994, 7.0000005)
+scale = Vector2(-5.291437, -77.62431)
+
+[node name="Barrier2" parent="Outer Walls" unique_id=1923765013 instance=ExtResource("5_mgp4m")]
+position = Vector2(786.99994, 2)
+scale = Vector2(-3.1069047, -77.67901)
+
+[node name="Barrier3" parent="Outer Walls" unique_id=553118194 instance=ExtResource("5_mgp4m")]
+position = Vector2(1.0000001, 504)
+rotation = 1.5707964
+scale = Vector2(2.1508512, -89.3992)
+
+[node name="Barrier4" parent="Outer Walls" unique_id=1067325934 instance=ExtResource("5_mgp4m")]
+position = Vector2(6.0000005, -516)
+rotation = 1.5707964
+scale = Vector2(2.1508512, -88.879196)
