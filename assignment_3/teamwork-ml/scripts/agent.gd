@@ -41,9 +41,7 @@ func update_direction(new_direction: Vector2) -> void:
     direction.x += randf_range(-maxDeviation, maxDeviation)
     direction.y += randf_range(-maxDeviation, maxDeviation)
     direction = direction.normalized()
-    print("Updating direction to %s" % direction)
     velocity = direction * speed
-    print("New velocity: %s" % velocity)
 
 func reset() -> void:
     direction = Vector2.ZERO
