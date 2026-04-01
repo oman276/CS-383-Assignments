@@ -23,6 +23,6 @@ func _process(delta: float) -> void:
 		var currentMousePosition = get_global_mouse_position()
 		var direction = currentMousePosition - lastMousePosition
 		if direction != Vector2.ZERO:
-			GameManager.Signals.note_velocity.emit(lastMousePosition, direction)
+			Signals.note_velocity.emit(lastMousePosition, direction)
 
 		lastMousePosition = currentMousePosition
