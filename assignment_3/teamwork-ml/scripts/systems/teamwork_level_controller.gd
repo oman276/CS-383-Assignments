@@ -21,7 +21,7 @@ var current_round: int = 1
 var weigh_recency: bool = true
 var weigh_proximity: bool = true
 
-# @onready var Signals : TeamworkSignalBus = TeamworkSignalBus.new()
+var activeAgentCount: int
 
 func _ready() -> void:
 	if has_node("TargetPosition"):
@@ -34,6 +34,9 @@ func _ready() -> void:
 		get_parent().add_child(agent)
 		agent.global_position = Vector2.ZERO
 		agents.append(agent)
+	
+	activeAgentCount = agentNumber
+	Signals.agent_deactivated.connect(_on_agent_deactivated)
 
 func _process(delta: float) -> void:
 	if GameManager.tm_state == GameManager.TeamworkGameState.RESETTING:
@@ -197,3 +200,8 @@ func reset_state() -> void:
 
 	print("reset done")
 	GameManager.tm_state = GameManager.TeamworkGameState.RUNNING
+
+func _on_agent_deactivated() -> void:
+	activeAgentCount -= 1
+	if activeAgentCount <= 0:
+		reset_state()

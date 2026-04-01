@@ -36,7 +36,7 @@ func _ready() -> void:
     add_child(path_line)
     path_line.add_point(global_position)
 
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
     if current_state == AgentState.INACTIVE:
         return
 
@@ -75,6 +75,7 @@ func reset() -> void:
         path_line.clear_points()
 
 func deactivate() -> void:
+    Signals.agent_deactivated.emit()
     current_state = AgentState.INACTIVE
     velocity = Vector2.ZERO
     if sprite:
