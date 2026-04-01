@@ -4,6 +4,7 @@
     "**/.git": true,
     "**/.DS_Store": true,
     "**/node_modules": true,
-    "**/uid": true
+    "**/.gd.uid": true,
+    "**/*.uid": true
   }
 }

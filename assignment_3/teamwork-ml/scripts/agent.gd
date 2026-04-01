@@ -45,7 +45,7 @@ func _physics_process(delta: float) -> void:
     move_and_slide()
 
     if get_slide_collision_count() > 0:
-        _impact(get_slide_collision(0))
+        _impact(get_slide_collision(0).get_normal())
 
 func update_direction(new_direction: Vector2) -> void:
     if path_line:
@@ -60,7 +60,7 @@ func update_direction(new_direction: Vector2) -> void:
 
 func _impact(normal : Vector2) -> void:
     var mirrored : Vector2 = velocity.bounce(normal)
-    GameManager.Signals.note_velocity.emit(global_position, mirrored)
+    Signals.note_velocity.emit(global_position, mirrored)
     deactivate()
 
 

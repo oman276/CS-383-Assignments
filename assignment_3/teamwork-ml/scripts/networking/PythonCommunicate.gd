@@ -6,7 +6,7 @@ func _ready() -> void:
 	server = UDPServer.new()
 	server.listen(4242)
 
-	GameManager.Signals.note_velocity.connect(send_velocity_update)
+	Signals.note_velocity.connect(send_velocity_update)
 
 func _process(_delta: float) -> void:
 	server.poll()

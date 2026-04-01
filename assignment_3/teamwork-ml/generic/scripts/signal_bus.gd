@@ -1,3 +1,3 @@
-extends RefCounted
+extends Node
 class_name SignalBus
 
