@@ -14,6 +14,8 @@ var path_line: Line2D
 
 #eventually have us pass in the color from above so we're painting something new every time
 func _ready() -> void:
+    global_position = Vector2.ZERO
+
     var sprite : Sprite2D = $CollisionShape2D/Sprite2D
     if sprite:
         sprite.modulate = randColor

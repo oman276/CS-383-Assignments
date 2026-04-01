@@ -23,12 +23,16 @@ var weigh_proximity: bool = true
 
 
 func _ready() -> void:
+	if has_node("TargetPosition"):
+		var target_position_node := get_node("TargetPosition") as Node2D
+		if target_position_node:
+			target_position_node.global_position = Vector2.ZERO
+
 	for i in range(agentNumber):
 		var agent = agentScene.instantiate()
 		get_parent().add_child(agent)
+		agent.global_position = Vector2.ZERO
 		agents.append(agent)
-
-	
 
 func _process(delta: float) -> void:
 	if GameManager.tm_state == GameManager.TeamworkGameState.RESETTING:
@@ -148,6 +152,7 @@ func reset_state() -> void:
 	
 	for agent in agents:
 		agent.reset()
+		agent.global_position = Vector2.ZERO
 	current_round += 1
 	
 	# update the tree

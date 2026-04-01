@@ -4,11 +4,11 @@
 [ext_resource type="Script" uid="uid://ryts6mu5e8sa" path="res://scripts/systems/teamwork_level_controller.gd" id="1_o3x8r"]
 [ext_resource type="PackedScene" uid="uid://dnei0go0sxghg" path="res://scenes/MLAgent.tscn" id="2_okul0"]
 [ext_resource type="Script" uid="uid://eb50mk6bwf48" path="res://scripts/networking/python_send_mouse.gd" id="4_okul0"]
-[ext_resource type="PackedScene" uid="uid://clhmiv7gjbpgp" path="res://scenes/level_elements/Barrier.tscn" id="5_mgp4m"]
+[ext_resource type="PackedScene" uid="uid://n0rblef8ji0q" path="res://scenes/level_elements/WorldBoundaryHolder.tscn" id="5_mgp4m"]
+[ext_resource type="PackedScene" uid="uid://8mh0m08ofedc" path="res://scenes/level_elements/WorldBoundaryWall.tscn" id="6_40v7j"]
 
-[node name="TestRoot" type="Node2D" unique_id=348076594 node_paths=PackedStringArray("player")]
+[node name="TestRoot" type="Node2D" unique_id=348076594]
 script = ExtResource("1_o3x8r")
-player = NodePath("")
 agentScene = ExtResource("2_okul0")
 agentNumber = 50
 updatePerSecond = 100
@@ -23,22 +23,5 @@ target = NodePath("../TargetPosition")
 script = ExtResource("4_okul0")
 sendPerSecond = 30
 
-[node name="Outer Walls" type="Node2D" parent="." unique_id=1860079217]
-
-[node name="Barrier" parent="Outer Walls" unique_id=958169156 instance=ExtResource("5_mgp4m")]
-position = Vector2(-817.99994, 7.0000005)
-scale = Vector2(-5.291437, -77.62431)
-
-[node name="Barrier2" parent="Outer Walls" unique_id=1923765013 instance=ExtResource("5_mgp4m")]
-position = Vector2(786.99994, 2)
-scale = Vector2(-3.1069047, -77.67901)
-
-[node name="Barrier3" parent="Outer Walls" unique_id=553118194 instance=ExtResource("5_mgp4m")]
-position = Vector2(1.0000001, 504)
-rotation = 1.5707964
-scale = Vector2(2.1508512, -89.3992)
-
-[node name="Barrier4" parent="Outer Walls" unique_id=1067325934 instance=ExtResource("5_mgp4m")]
-position = Vector2(6.0000005, -516)
-rotation = 1.5707964
-scale = Vector2(2.1508512, -88.879196)
+[node name="WorldBoundaryHolder" parent="." unique_id=486528728 instance=ExtResource("5_mgp4m")]
+wallScene = ExtResource("6_40v7j")
