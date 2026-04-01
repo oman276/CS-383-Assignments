@@ -45,8 +45,7 @@ func _physics_process(delta: float) -> void:
     move_and_slide()
 
     if get_slide_collision_count() > 0:
-        print("ouch!")
-        deactivate()
+        _impact(get_slide_collision(0))
 
 func update_direction(new_direction: Vector2) -> void:
     if path_line:
@@ -58,6 +57,13 @@ func update_direction(new_direction: Vector2) -> void:
     direction.y += randf_range(-maxDeviation, maxDeviation)
     direction = direction.normalized()
     velocity = direction * speed
+
+func _impact(normal : Vector2) -> void:
+    var mirrored : Vector2 = velocity.bounce(normal)
+    # update_direction(mirrored)
+    # signal bus signal bus signal bus
+    deactivate()
+
 
 func reset() -> void:
     direction = Vector2.ZERO

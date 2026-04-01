@@ -1,3 +1,9 @@
 {
-  "godotTools.editorPath.godot4": "c:\\Users\\oweng\\OneDrive\\Desktop\\Godot_v4.6.1-stable_win64.exe\\Godot_v4.6.1-stable_win64.exe"
+  "godotTools.editorPath.godot4": "c:\\Users\\User\\Downloads\\Godot_v4.6-stable_win64.exe\\Godot_v4.6-stable_win64.exe",
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/uid": true
+  }
 }
