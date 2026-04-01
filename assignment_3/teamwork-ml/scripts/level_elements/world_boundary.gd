@@ -42,8 +42,8 @@ func position_walls():
 
 	walls[2].global_position = start
 	#	walls[2].shape = walls[2].shape.duplicate() as WorldBoundaryShape2D
-	walls[2].shape.normal = Vector2(0, -1)
+	walls[2].shape.normal = Vector2(0, 1)
 
 	walls[3].global_position = end
 	#	walls[3].shape = walls[3].shape.duplicate() as WorldBoundaryShape2D
-	walls[3].shape.normal = Vector2(0, 1)
+	walls[3].shape.normal = Vector2(0, -1)
