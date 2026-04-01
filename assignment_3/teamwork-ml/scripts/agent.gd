@@ -19,11 +19,12 @@ enum AgentState {
 }
 var current_state: AgentState = AgentState.ACTIVE
 
+@onready var sprite : Sprite2D = $CollisionShape2D/Sprite2D
+
 #eventually have us pass in the color from above so we're painting something new every time
 func _ready() -> void:
     global_position = Vector2.ZERO
 
-    var sprite : Sprite2D = $CollisionShape2D/Sprite2D
     if sprite:
         sprite.modulate = randColor
 
@@ -34,7 +35,6 @@ func _ready() -> void:
     path_line.top_level = true
     add_child(path_line)
     path_line.add_point(global_position)
-
 
 func _physics_process(delta: float) -> void:
     if current_state == AgentState.INACTIVE:
@@ -63,8 +63,14 @@ func reset() -> void:
     direction = Vector2.ZERO
     velocity = Vector2.ZERO
     global_position = Vector2.ZERO
+    current_state = AgentState.ACTIVE
+    if sprite:
+        sprite.modulate = randColor
     if path_line:
         path_line.clear_points()
 
 func deactivate() -> void:
+    current_state = AgentState.INACTIVE
     velocity = Vector2.ZERO
+    if sprite:
+        sprite.modulate = Color(0.0, 0.0, 0.0, 0.0)
