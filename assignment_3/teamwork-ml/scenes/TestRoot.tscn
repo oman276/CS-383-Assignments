@@ -10,7 +10,7 @@
 [node name="TestRoot" type="Node2D" unique_id=348076594]
 script = ExtResource("1_o3x8r")
 agentScene = ExtResource("2_okul0")
-agentNumber = 50
+agentNumber = 10
 updatePerSecond = 100
 queryNeighborCount = 10
 
