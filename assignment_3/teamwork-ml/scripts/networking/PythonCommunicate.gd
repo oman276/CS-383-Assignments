@@ -6,7 +6,7 @@ func _ready() -> void:
 	server = UDPServer.new()
 	server.listen(4242)
 
-	Signals.note_velocity.connect(send_velocity_update)
+	# Signals.note_velocity.connect(send_velocity_update)
 
 func _process(_delta: float) -> void:
 	server.poll()
@@ -16,4 +16,3 @@ func _process(_delta: float) -> void:
 		print("Received: '%s' %s:%s" % [packet.get_string_from_utf8(), peer.get_packet_ip(), peer.get_packet_port()])
 
 		peer.put_packet("Hello from Godot!".to_utf8_buffer())
-
