@@ -34,6 +34,10 @@ func _physics_process(delta: float) -> void:
         path_line.set_point_position(0, global_position)
     move_and_slide()
 
+    if get_slide_collision_count() > 0:
+        print("ouch!")
+        queue_free() # test die agent
+
 func update_direction(new_direction: Vector2) -> void:
     if path_line:
         path_line.add_point(global_position, 1)
