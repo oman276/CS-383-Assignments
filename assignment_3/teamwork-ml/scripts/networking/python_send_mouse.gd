@@ -13,12 +13,9 @@ func _process(delta: float) -> void:
 	timeSinceLastSend += delta
 
 	if Input.is_action_just_released("mouse"):
-		#print("mouse up")
 		hasStartPosition = false
 
 	elif Input.is_action_just_pressed("mouse"):
-		#print("mouse down")
-		# start recording mouse positions
 		hasStartPosition = true
 		lastMousePosition = get_global_mouse_position()
 
@@ -26,17 +23,6 @@ func _process(delta: float) -> void:
 		var currentMousePosition = get_global_mouse_position()
 		var direction = currentMousePosition - lastMousePosition
 		if direction != Vector2.ZERO:
-			#print("sending velocity update to Python server: %s" % direction)
-
-			var message = "update,%f,%f,%f,%f" % [
-				currentMousePosition.x,
-				currentMousePosition.y,
-				direction.x,
-				direction.y
-			]
-			var udp = PacketPeerUDP.new()
-			udp.set_dest_address("127.0.0.1", 5005)
-			udp.put_packet(message.to_utf8_buffer())
-			udp.close()
+			GameManager.Signals.note_velocity.emit(lastMousePosition, direction)
 
 		lastMousePosition = currentMousePosition

@@ -60,8 +60,7 @@ func update_direction(new_direction: Vector2) -> void:
 
 func _impact(normal : Vector2) -> void:
     var mirrored : Vector2 = velocity.bounce(normal)
-    # update_direction(mirrored)
-    # signal bus signal bus signal bus
+    GameManager.Signals.note_velocity.emit(global_position, mirrored)
     deactivate()
 
 

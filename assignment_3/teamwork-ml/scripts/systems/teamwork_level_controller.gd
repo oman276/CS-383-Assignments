@@ -21,6 +21,7 @@ var current_round: int = 1
 var weigh_recency: bool = true
 var weigh_proximity: bool = true
 
+@onready var Signals : TeamworkSignalBus = new TeamworkSignalBus()
 
 func _ready() -> void:
 	if has_node("TargetPosition"):
