@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://da8x1swg77kdc"]
+
+[ext_resource type="Script" uid="uid://klkmwj5u2les" path="res://scripts/systems/teamwork_signal_bus.gd" id="1_uobei"]
+
+[node name="TeamworkSignalBus" type="Node" unique_id=824945289]
+script = ExtResource("1_uobei")

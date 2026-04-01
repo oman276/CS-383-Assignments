@@ -17,10 +17,3 @@ func _process(_delta: float) -> void:
 
 		peer.put_packet("Hello from Godot!".to_utf8_buffer())
 
-func send_velocity_update(position: Vector2, velocity: Vector2) -> void:
-	var normalized = velocity.normalized()
-	var message = "update,%f,%f,%f,%f" % [position.x, position.y, normalized.x, normalized.y]
-	var udp = PacketPeerUDP.new()
-	udp.set_dest_address("127.0.0.1", 5005)
-	udp.put_packet(message.to_utf8_buffer())
-	udp.close()
