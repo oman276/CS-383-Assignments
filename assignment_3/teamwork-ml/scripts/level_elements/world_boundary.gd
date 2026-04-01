@@ -17,6 +17,7 @@ func _ready() -> void:
 			walls.append(wall)
 
 	position_walls()
+	Signals.reset_agents.connect(position_walls)
 
 # todo need to finish my signal bus to auto update this when it's rime
 func position_walls():
@@ -33,17 +34,13 @@ func position_walls():
 	var end = canvasToWorld * (visibleRect.end + Vector2(-wallThickness, -wallThickness))
 	
 	walls[0].global_position = start
-	#	walls[0].shape = walls[0].shape.duplicate() as WorldBoundaryShape2D
 	walls[0].shape.normal = Vector2(1, 0)
 
 	walls[1].global_position = end
-	#	walls[1].shape = walls[1].shape.duplicate() as WorldBoundaryShape2D
 	walls[1].shape.normal = Vector2(-1, 0)
 
 	walls[2].global_position = start
-	#	walls[2].shape = walls[2].shape.duplicate() as WorldBoundaryShape2D
 	walls[2].shape.normal = Vector2(0, 1)
 
 	walls[3].global_position = end
-	#	walls[3].shape = walls[3].shape.duplicate() as WorldBoundaryShape2D
 	walls[3].shape.normal = Vector2(0, -1)

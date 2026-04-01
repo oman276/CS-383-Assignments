@@ -162,6 +162,8 @@ func shuffle_packed_array_in_place(arr: PackedStringArray) -> void:
 func reset_state() -> void:
 	print("Resetting state...")
 
+	Signals.reset_agents.emit()
+
 	activeAgentCount = agentNumber
 	GameManager.tm_state = GameManager.TeamworkGameState.RESETTING
 	

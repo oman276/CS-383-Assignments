@@ -17,7 +17,7 @@ enum AgentState {
     ACTIVE,
     INACTIVE
 }
-var current_state: AgentState = AgentState.ACTIVE
+@onready var current_state: AgentState = AgentState.ACTIVE
 
 @onready var sprite : Sprite2D = $CollisionShape2D/Sprite2D
 
@@ -34,23 +34,18 @@ func _ready() -> void:
     path_line.z_index = -1
     path_line.top_level = true
     add_child(path_line)
-    path_line.add_point(global_position)
 
 func _physics_process(_delta: float) -> void:
     if current_state == AgentState.INACTIVE:
         return
 
-    if path_line and path_line.get_point_count() > 0:
-        path_line.set_point_position(0, global_position)
+    path_line.add_point(global_position, 0)
     move_and_slide()
 
     if get_slide_collision_count() > 0:
         _impact(get_slide_collision(0).get_normal())
 
 func update_direction(new_direction: Vector2) -> void:
-    if path_line:
-        path_line.add_point(global_position, 1)
-
     velocity = Vector2.ZERO
     direction = new_direction.normalized()
     direction.x += randf_range(-maxDeviation, maxDeviation)
@@ -62,7 +57,6 @@ func _impact(normal : Vector2) -> void:
     var mirrored : Vector2 = velocity.bounce(normal)
     Signals.note_velocity.emit(global_position, mirrored)
     deactivate()
-
 
 func reset() -> void:
     direction = Vector2.ZERO
