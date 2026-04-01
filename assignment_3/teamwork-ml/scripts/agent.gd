@@ -1,4 +1,5 @@
 extends CharacterBody2D
+class_name MLAgent
 
 # moves around the scene based on a velocity sent by the level controller
 # level controller will ping server for velocity updates for an agent every n seconds
@@ -11,6 +12,12 @@ var direction: Vector2 = Vector2.ZERO
 var path_line: Line2D
 
 @export var lineWidth: float = 5.0
+
+enum AgentState {
+    ACTIVE,
+    INACTIVE
+}
+var current_state: AgentState = AgentState.ACTIVE
 
 #eventually have us pass in the color from above so we're painting something new every time
 func _ready() -> void:
@@ -30,6 +37,9 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+    if current_state == AgentState.INACTIVE:
+        return
+
     if path_line and path_line.get_point_count() > 0:
         path_line.set_point_position(0, global_position)
     move_and_slide()
@@ -55,3 +65,6 @@ func reset() -> void:
     global_position = Vector2.ZERO
     if path_line:
         path_line.clear_points()
+
+func deactivate() -> void:
+    velocity = Vector2.ZERO

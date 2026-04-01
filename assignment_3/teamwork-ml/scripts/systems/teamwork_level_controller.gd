@@ -55,7 +55,10 @@ func _update_agent() -> void:
 
 	# pick a random agent
 	var agentIndex = randi() % agents.size()
-	var agent = agents[agentIndex]
+	var agent = agents[agentIndex] as MLAgent
+	if agent.current_state == MLAgent.AgentState.INACTIVE:
+		return
+
 	# request a new velocity for that agent from the Python server
 	var query_message = "query,%f,%f,%d,%d" % [agent.global_position.x, agent.global_position.y, queryNeighborCount, agentIndex]
 	var udp := PacketPeerUDP.new()
@@ -106,8 +109,8 @@ func _poll_pending_requests() -> void:
 				var count = 0
 
 				# some schochastic culling to get more interesting movement patterns
-				#velocity_entries.shuffle()
-				#velocity_entries = velocity_entries.slice(0, velocity_entries.size()/2)
+				velocity_entries.shuffle()
+				velocity_entries = velocity_entries.slice(0, velocity_entries.size()/2)
 
 				for entry in velocity_entries:
 					var vel_parts = entry.split(",", false)
@@ -125,7 +128,7 @@ func _poll_pending_requests() -> void:
 					continue
 
 				var average_velocity = sum_velocity / float(count)
-				var agent = agents[response_agent_index]
+				var agent = agents[response_agent_index] as MLAgent
 				if agent.has_method("update_direction"):
 					agent.update_direction(average_velocity)
 	
