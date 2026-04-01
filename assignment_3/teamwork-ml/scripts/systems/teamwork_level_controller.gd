@@ -109,7 +109,7 @@ func _poll_pending_requests() -> void:
 				var count = 0
 
 				# some schochastic culling to get more interesting movement patterns
-				velocity_entries.shuffle()
+				shuffle_packed_array_in_place(velocity_entries)
 				velocity_entries = velocity_entries.slice(0, velocity_entries.size()/2)
 
 				for entry in velocity_entries:
@@ -141,6 +141,18 @@ func _round_weighted_velocity(velocity: Vector2, result_round: int) -> Vector2:
 	var round_difference = current_round - result_round
 	var decay_factor = 1.0 / (1.0 + round_difference) if weigh_recency else 1.0
 	return velocity * decay_factor
+
+func shuffle_packed_array_in_place(arr: PackedStringArray) -> void:
+	var n = arr.size()
+	# Iterate from the end of the array down to the second element
+	for i in range(n - 1, 0, -1):
+		# Pick a random index from 0 to i
+		var j = randi() % (i + 1)
+		
+		# Swap the elements at i and j
+		var temp = arr[i]
+		arr[i] = arr[j]
+		arr[j] = temp
 
 # this starts a new round, incrementing our request systems
 func reset_state() -> void:

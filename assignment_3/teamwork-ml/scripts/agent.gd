@@ -46,7 +46,7 @@ func _physics_process(delta: float) -> void:
 
     if get_slide_collision_count() > 0:
         print("ouch!")
-        queue_free() # test die agent
+        deactivate()
 
 func update_direction(new_direction: Vector2) -> void:
     if path_line:
