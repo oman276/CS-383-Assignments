@@ -70,7 +70,7 @@ func update_direction(new_direction: Vector2) -> void:
 	velocity = direction * speed
 	path_line.add_point(global_position, 1)
 
-	print("agent %d new direction: %s, velocity: %s" % [get_instance_id(), direction, velocity])
+	# print("agent %d new direction: %s, velocity: %s" % [get_instance_id(), direction, velocity])
 
 func _impact(normal : Vector2) -> void:
 	# why does this break the engine?

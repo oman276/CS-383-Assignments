@@ -74,6 +74,10 @@ mouse={
 ]
 }
 
+[input_devices]
+
+pen_tablet/driver.windows="wintab"
+
 [layer_names]
 
 2d_physics/layer_2="Bot Collision"
