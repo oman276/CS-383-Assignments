@@ -137,7 +137,12 @@ func _poll_pending_requests() -> void:
 					# maybe we want to do something here?
 					continue
 
+				
 				var average_velocity = sum_velocity / float(count)
+				if not is_finite(average_velocity.x) or not is_finite(average_velocity.y):
+					push_warning("Computed NaN average velocity, skipping agent %d" % response_agent_index)
+					continue
+
 				var agent = agents[response_agent_index] as MLAgent
 				if agent.has_method("update_direction"):
 					agent.update_direction(average_velocity)
