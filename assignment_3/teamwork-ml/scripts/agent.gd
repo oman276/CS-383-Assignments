@@ -42,7 +42,6 @@ func _physics_process(_delta: float) -> void:
 	if current_state == AgentState.INACTIVE:
 		return
 
-	# path_line.add_point(global_position, 0)
 	move_and_slide()
 
 	if path_line.get_point_count() > 0:
@@ -59,6 +58,8 @@ func update_direction(new_direction: Vector2) -> void:
 	direction = direction.normalized()
 	velocity = direction * speed
 	path_line.add_point(global_position, 1)
+
+	print("agent %d new direction: %s, velocity: %s" % [get_instance_id(), direction, velocity])
 
 func _impact(normal : Vector2) -> void:
 	var mirrored : Vector2 = velocity.bounce(normal)

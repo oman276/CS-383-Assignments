@@ -19,6 +19,8 @@ func _ready() -> void:
 	pass
 
 func send_velocity_update(location: Vector2, velocity: Vector2) -> void:
+	print ("sending velocity update: location %s, velocity %s" % [location, velocity])
+
 	var normalized = velocity.normalized()
 	if normalized == Vector2.ZERO:
 		return # no need to update if this

@@ -141,7 +141,6 @@ def handle_action(parts):
 			return "error,update values must be finite"
 
 		_add_position_velocity(x, y, vel_x, vel_y)
-		# print(f"added position ({x}, {y}) and velocity ({vel_x}, {vel_y})")
 		return "ok,updated"
 
 	if action == "rebuild":
