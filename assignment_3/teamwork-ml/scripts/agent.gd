@@ -37,6 +37,8 @@ func _ready() -> void:
 	path_line.add_point(global_position, 0)
 	path_line.add_point(Vector2.ZERO, 1)
 
+	velocity = Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)).normalized() * speed
+
 
 func _physics_process(_delta: float) -> void:
 	if current_state == AgentState.INACTIVE:
@@ -62,6 +64,9 @@ func update_direction(new_direction: Vector2) -> void:
 	direction.x += randf_range(-maxDeviation, maxDeviation)
 	direction.y += randf_range(-maxDeviation, maxDeviation)
 	direction = direction.normalized()
+	if direction == Vector2.ZERO or is_nan(direction.x) or is_nan(direction.y):
+		push_warning("Agent %d computed invalid direction vector, assigning random direction: %s" % [get_instance_id(), direction])
+		direction = Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)).normalized()
 	velocity = direction * speed
 	path_line.add_point(global_position, 1)
 
