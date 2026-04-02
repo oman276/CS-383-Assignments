@@ -42,6 +42,7 @@ func _physics_process(_delta: float) -> void:
 
     # path_line.add_point(global_position, 0)
     move_and_slide()
+    path_line.set_point_position(0, global_position)
 
     if get_slide_collision_count() > 0:
         _impact(get_slide_collision(0).get_normal())
@@ -53,7 +54,7 @@ func update_direction(new_direction: Vector2) -> void:
     direction.y += randf_range(-maxDeviation, maxDeviation)
     direction = direction.normalized()
     velocity = direction * speed
-    path_line.add_point(global_position, 0)
+    path_line.add_point(global_position, 1)
 
 func _impact(normal : Vector2) -> void:
     var mirrored : Vector2 = velocity.bounce(normal)
