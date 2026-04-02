@@ -24,6 +24,7 @@ var weigh_proximity: bool = true
 var activeAgentCount: int
 
 @onready var reset_timer : Timer = $ResetTimer
+@onready var fade_manager : OwenCanvasFade = $ForegroundFade
 
 var colorPalettes = [
 	[Color("#E5BEED80"), Color("#9593D980"), Color("#7C90DB80"), Color("#736B9280"),Color("#7D5C6580")],
@@ -200,8 +201,10 @@ func shuffle_packed_array_in_place(arr: PackedStringArray) -> void:
 func reset_state() -> void:
 	print("Resetting state...")
 	# var colorPalette = colorPalettes[randi() % colorPalettes.size()]
-	var palette = colorPalettes[randi() % colorPalettes.size()]
+	fade_manager.fade_in()
+	await get_tree().create_timer(fade_manager.fade_duration).timeout
 
+	var palette = colorPalettes[randi() % colorPalettes.size()]
 	Signals.reset_agents.emit()
 
 	activeAgentCount = agentNumber
@@ -225,6 +228,8 @@ func reset_state() -> void:
 	Signals.send_rebuild_signal.emit()
 	set_timer()
 
+	fade_manager.fade_out()
+
 
 func _send_increase_round_request() -> void:
 	var udp := PacketPeerUDP.new()
@@ -242,7 +247,7 @@ func _send_increase_round_request() -> void:
 func _on_agent_deactivated() -> void:
 	activeAgentCount -= 1
 	print("An agent was deactivated. Active agent count: %d" % activeAgentCount)
-	if activeAgentCount <= 0:
+	if activeAgentCount <= 1:
 		reset_state()
 
 func set_timer() -> void:
