@@ -44,7 +44,9 @@ func _physics_process(_delta: float) -> void:
 
     # path_line.add_point(global_position, 0)
     move_and_slide()
-    path_line.set_point_position(0, global_position)
+
+    if path_line.get_point_count() > 0:
+        path_line.set_point_position(0, global_position)
 
     if get_slide_collision_count() > 0:
         _impact(get_slide_collision(0).get_normal())
@@ -72,6 +74,8 @@ func reset() -> void:
         sprite.modulate = randColor
     if path_line:
         path_line.clear_points()
+        path_line.add_point(global_position, 0)
+        path_line.add_point(Vector2.ZERO, 1)
 
 func deactivate() -> void:
     Signals.agent_deactivated.emit()

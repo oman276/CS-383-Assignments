@@ -14,6 +14,7 @@ func _process(delta: float) -> void:
 
 	if Input.is_action_just_released("mouse"):
 		hasStartPosition = false
+		Signals.send_rebuild_signal.emit()
 
 	elif Input.is_action_just_pressed("mouse"):
 		hasStartPosition = true
