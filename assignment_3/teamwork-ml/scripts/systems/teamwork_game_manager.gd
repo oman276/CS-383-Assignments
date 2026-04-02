@@ -19,7 +19,8 @@ func _ready() -> void:
 	pass
 
 func send_velocity_update(location: Vector2, velocity: Vector2) -> void:
-	print ("sending velocity update: location %s, velocity %s" % [location, velocity])
+	# assert(false)
+	print ("TGM sending velocity update: location %s, velocity %s" % [location, velocity])
 
 	var normalized = velocity.normalized()
 	if normalized == Vector2.ZERO:
@@ -31,6 +32,8 @@ func send_velocity_update(location: Vector2, velocity: Vector2) -> void:
 	udp.close()
 
 func send_rebuild_signal() -> void:
+	print("TGM sending rebuild signal to Python server...")
+
 	var query_message = "rebuild"
 	var udp := PacketPeerUDP.new()
 	var bind_result := udp.bind(0)
@@ -51,8 +54,8 @@ func send_rebuild_signal() -> void:
 		waited_ms += 1
 
 	if udp.get_available_packet_count() == 0:
-		print("No response received for reset query... :(")
+		print("No response received for rebuild query... :(")
 		udp.close()
 
-	print("reset done")
+	print("rebuild done")
 	GameManager.tm_state = GameManager.TeamworkGameState.RUNNING

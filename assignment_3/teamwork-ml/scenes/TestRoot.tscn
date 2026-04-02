@@ -10,6 +10,8 @@
 [node name="TestRoot" type="Node2D" unique_id=348076594]
 script = ExtResource("1_o3x8r")
 agentScene = ExtResource("2_okul0")
+agentNumber = 50
+updatePerSecond = 60
 queryNeighborCount = 10
 
 [node name="OwenCamera" parent="." unique_id=1808773620 node_paths=PackedStringArray("target") instance=ExtResource("1_nuy52")]

@@ -13,6 +13,7 @@ func _process(delta: float) -> void:
 	timeSinceLastSend += delta
 
 	if Input.is_action_just_released("mouse"):
+		print("SENDING REBUILD SIGNAL")
 		hasStartPosition = false
 		Signals.send_rebuild_signal.emit()
 
@@ -23,6 +24,7 @@ func _process(delta: float) -> void:
 	elif hasStartPosition:
 		var currentMousePosition = get_global_mouse_position()
 		var direction = currentMousePosition - lastMousePosition
+		direction = direction.normalized() 
 		if direction != Vector2.ZERO:
 			Signals.note_velocity.emit(lastMousePosition, direction)
 

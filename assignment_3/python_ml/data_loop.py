@@ -70,6 +70,7 @@ def _is_finite_number(value):
 
 
 def _ensure_kd_tree():
+	print("Ensuring KDTree is up to date...")
 	global kd_tree, kd_tree_size, kd_tree_dirty
 
 	# Safety net: remove any non-finite values before building the tree.
@@ -101,11 +102,14 @@ def _ensure_kd_tree():
 		kd_tree = None
 		kd_tree_size = 0
 		kd_tree_dirty = False
+		print("No valid positions available to build KDTree.")
 		return False
+	
 
 	if kd_tree is None or kd_tree_dirty:
 		kd_tree = KDTree(positions)
 		kd_tree_size = len(positions)
+		print(f"Rebuilt KDTree with {kd_tree_size} entries.")
 		kd_tree_dirty = False
 
 	return True
