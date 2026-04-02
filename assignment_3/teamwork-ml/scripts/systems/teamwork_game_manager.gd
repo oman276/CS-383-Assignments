@@ -23,7 +23,7 @@ func send_velocity_update(location: Vector2, velocity: Vector2) -> void:
 	print ("TGM sending velocity update: location %s, velocity %s" % [location, velocity])
 
 	var normalized = velocity.normalized()
-	if normalized == Vector2.ZERO:
+	if normalized == Vector2.ZERO or is_nan(normalized.x) or is_nan(normalized.y):
 		return # no need to update if this
 	var message = "update,%f,%f,%f,%f" % [location.x, location.y, normalized.x, normalized.y]
 	var udp = PacketPeerUDP.new()

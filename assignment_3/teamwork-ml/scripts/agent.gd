@@ -42,6 +42,8 @@ func _physics_process(_delta: float) -> void:
 	if current_state == AgentState.INACTIVE:
 		return
 
+	if 
+
 	move_and_slide()
 
 	if path_line.get_point_count() > 0:
