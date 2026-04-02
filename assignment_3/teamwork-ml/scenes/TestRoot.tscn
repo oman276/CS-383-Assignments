@@ -11,7 +11,7 @@
 script = ExtResource("1_o3x8r")
 agentScene = ExtResource("2_okul0")
 agentNumber = 40
-updatePerSecond = 120
+updatePerSecond = 100
 queryNeighborCount = 15
 
 [node name="Background UI" type="CanvasLayer" parent="." unique_id=862336736]

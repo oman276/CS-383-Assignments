@@ -13,12 +13,16 @@ var path_line: Line2D
 
 @export var lineWidth: float = 5.0
 
+
+
 enum AgentState {
 	ACTIVE,
 	INACTIVE
 }
 @onready var current_state: AgentState = AgentState.ACTIVE
 @onready var sprite : Sprite2D = $CollisionShape2D/Sprite2D
+
+@export var lineScene: PackedScene 
 
 #eventually have us pass in the color from above so we're painting something new every time
 func _ready() -> void:
@@ -27,7 +31,7 @@ func _ready() -> void:
 	if sprite:
 		sprite.modulate = randColor
 
-	path_line = Line2D.new()
+	path_line = lineScene.instantiate() as Line2D
 	path_line.default_color = randColor
 	path_line.width = lineWidth
 	path_line.z_index = -1

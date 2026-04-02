@@ -2,18 +2,22 @@
 
 [ext_resource type="Script" uid="uid://dpybhg817da1f" path="res://scripts/agent.gd" id="1_f8s4n"]
 [ext_resource type="Texture2D" uid="uid://chwf4kwqf4chx" path="res://addons/owens-godot-framework/tools/assets/basic_colors.png" id="1_nt522"]
+[ext_resource type="PackedScene" uid="uid://b2lteh57pohru" path="res://shaders/DrawnLine.tscn" id="2_v7goy"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_f8s4n"]
 
 [node name="MlAgent" type="CharacterBody2D" unique_id=454448767]
 z_index = 10
 z_as_relative = false
+position = Vector2(0, -1)
 scale = Vector2(0.5, 0.5)
 collision_layer = 0
 motion_mode = 1
 script = ExtResource("1_f8s4n")
 speed = 70.0
-maxDeviation = 0.07
+maxDeviation = 0.08
+lineWidth = 10.0
+lineScene = ExtResource("2_v7goy")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1903601355]
 shape = SubResource("RectangleShape2D_f8s4n")

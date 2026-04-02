@@ -25,6 +25,16 @@ var activeAgentCount: int
 
 @onready var reset_timer : Timer = $ResetTimer
 
+var colorPalettes = [
+	[Color("#E5BEED80"), Color("#9593D980"), Color("#7C90DB80"), Color("#736B9280"),Color("#7D5C6580")],
+	[Color("#12130f80"), Color("#5b927980"), Color("#8fcb9b80"), Color("#eae6e580"),Color("#8f807380")],
+	[Color("#69ddff80"), Color("#96cdff80"), Color("#d8e1ff80"), Color("#dbbadd80"),Color("#be92a280")],
+	[Color("#5d2a4280"), Color("#fb637680"), Color("#fcb1a680"), Color("#ffdccc80"),Color("#fff9ec80")],
+	[Color("#02020280"), Color("#0d281880"), Color("#04471c80"), Color("#058c4280"),Color("#16db6580")],
+	[Color("#13407480"), Color("#13315c80"), Color("#0b254580"), Color("#8da9c480"),Color("#eef4ed80")],
+	[Color("#8e9aaf80"), Color("#8e9aaf80"), Color("#efd3d780"), Color("#feeafa80"),Color("#dee2ff80")],
+	[Color("#5603ad80"), Color("#8367c780"), Color("#b3e9c780"), Color("#c2f8cb80"),Color("#f0fff180")]
+]
 
 func _ready() -> void:
 	if has_node("TargetPosition"):
@@ -185,6 +195,7 @@ func shuffle_packed_array_in_place(arr: PackedStringArray) -> void:
 # this starts a new round, incrementing our request systems
 func reset_state() -> void:
 	print("Resetting state...")
+	var colorPalette = colorPalettes[randi() % colorPalettes.size()]
 
 	Signals.reset_agents.emit()
 
@@ -200,6 +211,7 @@ func reset_state() -> void:
 	
 	for agent in agents:
 		agent.reset()
+		agent.modulate = colorPalette[randi() % colorPalette.size()]
 		agent.global_position = Vector2.ZERO
 	
 	# update the tree

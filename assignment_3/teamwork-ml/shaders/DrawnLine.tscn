@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://b2lteh57pohru"]
+
+[ext_resource type="Material" uid="uid://cjcknjkaygpt6" path="res://shaders/paint_material.tres" id="1_0mg73"]
+
+[node name="DrawnLine" type="Line2D" unique_id=1393051942]
+material = ExtResource("1_0mg73")
+texture_mode = 1
