@@ -20,6 +20,8 @@ func _ready() -> void:
 
 func send_velocity_update(location: Vector2, velocity: Vector2) -> void:
 	var normalized = velocity.normalized()
+	if normalized == Vector2.ZERO:
+		return # no need to update if this
 	var message = "update,%f,%f,%f,%f" % [location.x, location.y, normalized.x, normalized.y]
 	var udp = PacketPeerUDP.new()
 	udp.set_dest_address("127.0.0.1", 5005)

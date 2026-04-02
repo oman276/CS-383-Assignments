@@ -3,6 +3,7 @@ print("Starting imports...")
 import socket
 from constants import SERVER_IP, UPDATES_PORT, QUERY_PORT
 import select
+import math
 from sklearn.neighbors import KDTree
 
 print("Finished imports...")
@@ -64,8 +65,24 @@ def _add_position_velocity(x, y, vel_x, vel_y):
 	kd_tree_dirty = True
 
 
+def _is_finite_number(value):
+	return math.isfinite(value)
+
+
 def _ensure_kd_tree():
 	global kd_tree, kd_tree_size, kd_tree_dirty
+
+	# Safety net: remove any non-finite values before building the tree.
+	finite_entries = [
+		(pos, vel)
+		for pos, vel in zip(positions, velocities)
+		if _is_finite_number(pos[0]) and _is_finite_number(pos[1])
+		and _is_finite_number(vel[0]) and _is_finite_number(vel[1])
+	]
+	if len(finite_entries) != len(positions):
+		positions[:] = [pos for pos, _ in finite_entries]
+		velocities[:] = [vel for _, vel in finite_entries]
+		kd_tree_dirty = True
 
 	if cull_after >= 0:
 		min_round = current_round - cull_after
@@ -119,6 +136,9 @@ def handle_action(parts):
 			vel_y = float(parts[4])
 		except ValueError:
 			return "error,update values must be numeric"
+
+		if not all(_is_finite_number(v) for v in (x, y, vel_x, vel_y)):
+			return "error,update values must be finite"
 
 		_add_position_velocity(x, y, vel_x, vel_y)
 		# print(f"added position ({x}, {y}) and velocity ({vel_x}, {vel_y})")
