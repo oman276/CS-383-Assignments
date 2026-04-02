@@ -23,7 +23,7 @@ func _process(delta: float) -> void:
 
 	elif hasStartPosition:
 		var currentMousePosition = get_global_mouse_position()
-		var direction = lastMousePosition - currentMousePosition
+		var direction = currentMousePosition - lastMousePosition
 		direction = direction.normalized() 
 		if direction != Vector2.ZERO and not is_nan(direction.x) and not is_nan(direction.y):
 			print("PSM send update: location %s, direction %s" % [lastMousePosition, direction])
