@@ -37,6 +37,8 @@ var colorPalettes = [
 ]
 
 func _ready() -> void:
+	var palette = colorPalettes[randi() % colorPalettes.size()]
+
 	if has_node("TargetPosition"):
 		var target_position_node := get_node("TargetPosition") as Node2D
 		if target_position_node:
@@ -47,6 +49,9 @@ func _ready() -> void:
 		get_parent().add_child(agent)
 		agent.global_position = Vector2.ZERO
 		agents.append(agent)
+		var col = palette[randi() % palette.size()]
+		agent.modulate = col
+		agent.randColor = col
 	
 	activeAgentCount = agentNumber
 	Signals.agent_deactivated.connect(_on_agent_deactivated)
@@ -195,7 +200,8 @@ func shuffle_packed_array_in_place(arr: PackedStringArray) -> void:
 # this starts a new round, incrementing our request systems
 func reset_state() -> void:
 	print("Resetting state...")
-	var colorPalette = colorPalettes[randi() % colorPalettes.size()]
+	# var colorPalette = colorPalettes[randi() % colorPalettes.size()]
+	var palette = colorPalettes[randi() % colorPalettes.size()]
 
 	Signals.reset_agents.emit()
 
@@ -211,7 +217,9 @@ func reset_state() -> void:
 	
 	for agent in agents:
 		agent.reset()
-		agent.modulate = colorPalette[randi() % colorPalette.size()]
+		var col = palette[randi() % palette.size()]
+		agent.modulate = col
+		agent.randColor = col
 		agent.global_position = Vector2.ZERO
 	
 	# update the tree
