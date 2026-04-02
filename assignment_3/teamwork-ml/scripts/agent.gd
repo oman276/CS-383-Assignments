@@ -42,7 +42,9 @@ func _physics_process(_delta: float) -> void:
 	if current_state == AgentState.INACTIVE:
 		return
 
-	if 
+	if velocity == Vector2.ZERO or is_nan(velocity.x) or is_nan(velocity.y):
+		push_warning("Agent %d has invalid velocity, assigning random direction" % get_instance_id())
+		velocity = Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)).normalized() * speed
 
 	move_and_slide()
 
@@ -54,7 +56,7 @@ func _physics_process(_delta: float) -> void:
 
 func update_direction(new_direction: Vector2) -> void:
 	velocity = Vector2.ZERO
-	if new_direction == Vector2.ZERO:
+	if new_direction == Vector2.ZERO or is_nan(new_direction.x) or is_nan(new_direction.y):
 		new_direction = Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)).normalized()
 	direction = new_direction.normalized()
 	direction.x += randf_range(-maxDeviation, maxDeviation)
