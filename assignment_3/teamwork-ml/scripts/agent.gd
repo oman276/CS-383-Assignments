@@ -8,7 +8,8 @@ var direction: Vector2 = Vector2.ZERO
 @export var speed: float = 50.0
 @export var maxDeviation: float = 0.05
 
-@onready var randColor = Color(randf(), randf(), randf(), 0.5)
+# @onready var randColor = Color(randf(), randf(), randf(), 0.5)
+var color : Color
 var path_line: Line2D
 
 @export var lineWidth: float = 5.0
@@ -29,10 +30,10 @@ func _ready() -> void:
 	global_position = Vector2.ZERO
 
 	if sprite:
-		sprite.modulate = randColor
+		sprite.modulate = color
 
 	path_line = lineScene.instantiate() as Line2D
-	path_line.default_color = randColor
+	path_line.default_color = color
 	path_line.width = lineWidth
 	path_line.z_index = -1
 	path_line.top_level = true
@@ -103,3 +104,10 @@ func deactivate() -> void:
 	velocity = Vector2.ZERO
 	if sprite:
 		sprite.modulate = Color(0.0, 0.0, 0.0, 0.0)
+
+func change_color(new_color: Color) -> void:
+	color = new_color
+	if sprite:
+		sprite.modulate = color
+	if path_line:
+		path_line.default_color = color

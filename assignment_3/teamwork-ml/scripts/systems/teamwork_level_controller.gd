@@ -50,8 +50,7 @@ func _ready() -> void:
 		agent.global_position = Vector2.ZERO
 		agents.append(agent)
 		var col = palette[randi() % palette.size()]
-		agent.modulate = col
-		agent.randColor = col
+		agent.change_color(col)
 	
 	activeAgentCount = agentNumber
 	Signals.agent_deactivated.connect(_on_agent_deactivated)
@@ -218,8 +217,7 @@ func reset_state() -> void:
 	for agent in agents:
 		agent.reset()
 		var col = palette[randi() % palette.size()]
-		agent.modulate = col
-		agent.randColor = col
+		agent.change_color(col)
 		agent.global_position = Vector2.ZERO
 	
 	# update the tree
