@@ -25,3 +25,6 @@ sendPerSecond = 30
 
 [node name="WorldBoundaryHolder" parent="." unique_id=486528728 instance=ExtResource("5_mgp4m")]
 wallScene = ExtResource("6_40v7j")
+
+[node name="ResetTimer" type="Timer" parent="." unique_id=1953303891]
+wait_time = 30.0

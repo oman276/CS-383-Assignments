@@ -18,7 +18,6 @@ enum AgentState {
 	INACTIVE
 }
 @onready var current_state: AgentState = AgentState.ACTIVE
-
 @onready var sprite : Sprite2D = $CollisionShape2D/Sprite2D
 
 #eventually have us pass in the color from above so we're painting something new every time

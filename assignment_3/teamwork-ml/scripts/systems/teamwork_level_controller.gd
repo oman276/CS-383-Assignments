@@ -23,6 +23,9 @@ var weigh_proximity: bool = true
 
 var activeAgentCount: int
 
+@onready var reset_timer : Timer = $ResetTimer
+
+
 func _ready() -> void:
 	if has_node("TargetPosition"):
 		var target_position_node := get_node("TargetPosition") as Node2D
@@ -37,6 +40,10 @@ func _ready() -> void:
 	
 	activeAgentCount = agentNumber
 	Signals.agent_deactivated.connect(_on_agent_deactivated)
+	
+	# reset a timer to trigger state reset
+	reset_timer.timeout.connect(reset_state)
+	set_timer()
 
 func _process(delta: float) -> void:
 	if GameManager.tm_state == GameManager.TeamworkGameState.RESETTING:
@@ -190,9 +197,15 @@ func reset_state() -> void:
 	
 	# update the tree
 	Signals.send_rebuild_signal.emit()
+	set_timer()
 	
 
 func _on_agent_deactivated() -> void:
 	activeAgentCount -= 1
 	if activeAgentCount <= 0:
 		reset_state()
+
+func set_timer() -> void:
+	reset_timer.stop()
+	reset_timer.wait_time = randf_range(25.0, 35.0)
+	reset_timer.start()
