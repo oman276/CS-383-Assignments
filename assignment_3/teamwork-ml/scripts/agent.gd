@@ -64,6 +64,8 @@ func update_direction(new_direction: Vector2) -> void:
 	print("agent %d new direction: %s, velocity: %s" % [get_instance_id(), direction, velocity])
 
 func _impact(normal : Vector2) -> void:
+	# why does this break the engine?
+	normal = normal.normalized()
 	var mirrored : Vector2 = velocity.bounce(normal)
 	Signals.note_velocity.emit(global_position, mirrored)
 	deactivate()

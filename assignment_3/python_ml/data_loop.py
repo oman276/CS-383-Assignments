@@ -5,6 +5,7 @@ from constants import SERVER_IP, UPDATES_PORT, QUERY_PORT
 import select
 import math
 from sklearn.neighbors import KDTree
+import random
 
 print("Finished imports...")
 
@@ -34,7 +35,7 @@ current_round = 1
 # debug variables
 weigh_recency = True
 weigh_proximity = True
-cull_after = 10 # if -1, do not need to cull any from tree
+cull_after = -1 
 
 def parse_message(raw_data):
 	decoded = raw_data.decode().strip()
@@ -104,13 +105,13 @@ def _ensure_kd_tree():
 		kd_tree_dirty = False
 		print("No valid positions available to build KDTree.")
 		return False
-	
 
-	if kd_tree is None or kd_tree_dirty:
-		kd_tree = KDTree(positions)
-		kd_tree_size = len(positions)
-		print(f"Rebuilt KDTree with {kd_tree_size} entries.")
-		kd_tree_dirty = False
+	print(f"Building KDTree with {len(positions)} entries...")
+	kd_tree = KDTree(positions)
+	kd_tree_size = len(positions)
+	print("kd_tree size :", kd_tree.data.shape[0])
+	print(f"Positions length is {kd_tree_size} entries.")
+
 
 	return True
 
@@ -144,6 +145,10 @@ def handle_action(parts):
 		if not all(_is_finite_number(v) for v in (x, y, vel_x, vel_y)):
 			return "error,update values must be finite"
 
+		if vel_x == 0 and vel_y == 0:
+			# assign a small random velocity to prevent zero-velocity points from dominating queries
+			vel_x = random.uniform(-0.5, 0.5)
+			vel_y = random.uniform(-0.5, 0.5)
 		_add_position_velocity(x, y, vel_x, vel_y)
 		return "ok,updated"
 
