@@ -124,11 +124,17 @@ func _poll_pending_requests() -> void:
 
 					var vel_x = vel_parts[0].to_float()
 					var vel_y = vel_parts[1].to_float()
+					if not is_finite(vel_x) or not is_finite(vel_y):
+						print("Malformed velocity entry (non-finite values): '%s'" % entry)
+						continue
+					
 					var result_round = vel_parts[2].to_int() if vel_parts.size() > 2 else 0
 					sum_velocity += _round_weighted_velocity(Vector2(vel_x, vel_y), result_round)
 					count += 1
 
 				if count == 0:
+					print("No valid velocity entries received for agent %d" % response_agent_index)
+					# maybe we want to do something here?
 					continue
 
 				var average_velocity = sum_velocity / float(count)

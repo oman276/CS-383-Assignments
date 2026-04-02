@@ -66,6 +66,9 @@ func update_direction(new_direction: Vector2) -> void:
 func _impact(normal : Vector2) -> void:
 	# why does this break the engine?
 	normal = normal.normalized()
+	if normal == Vector2.ZERO || is_nan(normal.x) || is_nan(normal.y):
+		print("rejecting invalid normal vector: %s" % normal)
+		return
 	var mirrored : Vector2 = velocity.bounce(normal)
 	Signals.note_velocity.emit(global_position, mirrored)
 	deactivate()
