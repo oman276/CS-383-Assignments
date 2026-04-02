@@ -35,6 +35,8 @@ func _ready() -> void:
     path_line.top_level = true
     add_child(path_line)
     path_line.add_point(global_position, 0)
+    path_line.add_point(Vector2.ZERO, 1)
+
 
 func _physics_process(_delta: float) -> void:
     if current_state == AgentState.INACTIVE:
