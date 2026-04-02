@@ -92,7 +92,7 @@ func reset() -> void:
 	global_position = Vector2.ZERO
 	current_state = AgentState.ACTIVE
 	if sprite:
-		sprite.modulate = randColor
+		sprite.modulate = color
 	if path_line:
 		path_line.clear_points()
 		path_line.add_point(global_position, 0)
