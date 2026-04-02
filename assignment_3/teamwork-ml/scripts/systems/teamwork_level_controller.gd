@@ -125,7 +125,7 @@ func _poll_pending_requests() -> void:
 
 				for entry in velocity_entries:
 					var vel_parts = entry.split(",", false)
-					if vel_parts.size() != 3:
+					if vel_parts.size() < 3:
 						print("Malformed velocity entry (weird num of components): '%s'" % entry)
 						continue
 
@@ -135,8 +135,13 @@ func _poll_pending_requests() -> void:
 						print("Malformed velocity entry (non-finite values): '%s'" % entry)
 						continue
 					
-					var result_round = vel_parts[2].to_int() if vel_parts.size() > 2 else 0
-					sum_velocity += _round_weighted_velocity(Vector2(vel_x, vel_y), result_round)
+					var result_round = vel_parts[2].to_int()
+					var neighbor_distance = vel_parts[3].to_float() if vel_parts.size() > 3 else 0.0
+					if not is_finite(neighbor_distance) or neighbor_distance < 0.0:
+						print("Malformed velocity entry (invalid distance): '%s'" % entry)
+						continue
+
+					sum_velocity += _round_weighted_velocity(Vector2(vel_x, vel_y), result_round, neighbor_distance)
 					count += 1
 
 				if count == 0:
@@ -158,11 +163,12 @@ func _poll_pending_requests() -> void:
 	for i in range(requests_to_remove.size() - 1, -1, -1):
 		pending_requests.remove_at(requests_to_remove[i])
 	   
-func _round_weighted_velocity(velocity: Vector2, result_round: int) -> Vector2:
-	# we could fiddle with this decay factor but I think this works for now
+func _round_weighted_velocity(velocity: Vector2, result_round: int, neighbor_distance: float = 0.0) -> Vector2:
+	# combine recency and proximity so stale and distant neighbors influence less
 	var round_difference = current_round - result_round
 	var decay_factor = 1.0 / (1.0 + round_difference) if weigh_recency else 1.0
-	return velocity * decay_factor
+	var proximity_factor = 1.0 / (1.0 + neighbor_distance) if weigh_proximity else 1.0
+	return velocity * decay_factor * proximity_factor
 
 func shuffle_packed_array_in_place(arr: PackedStringArray) -> void:
 	var n = arr.size()
@@ -183,7 +189,9 @@ func reset_state() -> void:
 	Signals.reset_agents.emit()
 
 	activeAgentCount = agentNumber
-	GameManager.tm_state = GameManager.TeamworkGameState.RESETTING
+	if GameManager.tm_state != GameManager.TeamworkGameState.RESETTING:
+		GameManager.tm_state = GameManager.TeamworkGameState.RESETTING
+		_send_increase_round_request()
 	
 	# Close all pending UDP requests
 	for request in pending_requests:
@@ -193,11 +201,23 @@ func reset_state() -> void:
 	for agent in agents:
 		agent.reset()
 		agent.global_position = Vector2.ZERO
-	current_round += 1
 	
 	# update the tree
 	Signals.send_rebuild_signal.emit()
 	set_timer()
+
+
+func _send_increase_round_request() -> void:
+	var udp := PacketPeerUDP.new()
+	var bind_result := udp.bind(0)
+	if bind_result != OK:
+		push_warning("Failed to bind UDP socket for increase_round request")
+		return
+
+	udp.set_dest_address(pythonServerIp, pythonQueryPort)
+	udp.put_packet("increase_round".to_utf8_buffer())
+	udp.close()
+	current_round += 1
 	
 
 func _on_agent_deactivated() -> void:

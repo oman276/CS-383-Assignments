@@ -35,7 +35,7 @@ current_round = 1
 # debug variables
 weigh_recency = True
 weigh_proximity = True
-cull_after = -1 
+cull_after = 10
 
 def parse_message(raw_data):
 	decoded = raw_data.decode().strip()
@@ -43,10 +43,14 @@ def parse_message(raw_data):
 	return decoded, parts
 
 
-def format_velocity_response(nearest_velocities):
-	if not nearest_velocities:
+def format_velocity_response(nearest_results):
+	if not nearest_results:
 		return ""
-	return ";".join(f"{vx},{vy},{round}" for vx, vy, round in nearest_velocities)
+	# each entry: (vel_x, vel_y, round, distance_to_query)
+	return ";".join(
+		f"{vx},{vy},{round},{distance}"
+		for vx, vy, round, distance in nearest_results
+	)
 
 
 def _can_parse_float(value):
@@ -155,10 +159,12 @@ def handle_action(parts):
 	if action == "rebuild":
 		if not _ensure_kd_tree():
 			return "error,no positions available"
-		
-		# update the current round
-		current_round += 1
+
 		return "ok,rebuilt"
+
+	if action == "increase_round":
+		current_round += 1
+		return f"ok,round,{current_round}"
 
 	if action == "query":
 		if len(parts) < 5:
@@ -179,10 +185,18 @@ def handle_action(parts):
 			return "error,k must be > 0"
 
 		k = min(k, kd_tree_size)
-		_, indices = kd_tree.query([[query_x, query_y]], k=k)
-		nearest_velocities = [velocities[index] for index in indices[0]]
-		# response format: "ok,agent_index,velX1,velY1,round1;velX2,velY2,round2;..."
-		return f"ok,{agent_index},{format_velocity_response(nearest_velocities)}"
+		distances, indices = kd_tree.query([[query_x, query_y]], k=k)
+		nearest_results = [
+			(
+				velocities[index][0],
+				velocities[index][1],
+				velocities[index][2],
+				float(distances[0][pos]),
+			)
+			for pos, index in enumerate(indices[0])
+		]
+		# response format: "ok,agent_index,velX1,velY1,round1,distance1;velX2,velY2,round2,distance2;..."
+		return f"ok,{agent_index},{format_velocity_response(nearest_results)}"
 
 	# malformed message
 	print(f"Received malformed message: {decoded}")
