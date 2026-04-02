@@ -34,12 +34,13 @@ func _ready() -> void:
     path_line.z_index = -1
     path_line.top_level = true
     add_child(path_line)
+    path_line.add_point(global_position, 0)
 
 func _physics_process(_delta: float) -> void:
     if current_state == AgentState.INACTIVE:
         return
 
-    path_line.add_point(global_position, 0)
+    # path_line.add_point(global_position, 0)
     move_and_slide()
 
     if get_slide_collision_count() > 0:
@@ -52,6 +53,7 @@ func update_direction(new_direction: Vector2) -> void:
     direction.y += randf_range(-maxDeviation, maxDeviation)
     direction = direction.normalized()
     velocity = direction * speed
+    path_line.add_point(global_position, 0)
 
 func _impact(normal : Vector2) -> void:
     var mirrored : Vector2 = velocity.bounce(normal)
