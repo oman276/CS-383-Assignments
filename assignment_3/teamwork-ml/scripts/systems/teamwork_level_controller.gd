@@ -205,6 +205,7 @@ func reset_state() -> void:
 	Signals.reset_agents.emit()
 
 	activeAgentCount = agentNumber
+	print("active agent count reset to %d" % activeAgentCount)
 	if GameManager.tm_state != GameManager.TeamworkGameState.RESETTING:
 		GameManager.tm_state = GameManager.TeamworkGameState.RESETTING
 		_send_increase_round_request()
@@ -240,6 +241,7 @@ func _send_increase_round_request() -> void:
 
 func _on_agent_deactivated() -> void:
 	activeAgentCount -= 1
+	print("An agent was deactivated. Active agent count: %d" % activeAgentCount)
 	if activeAgentCount <= 0:
 		reset_state()
 
