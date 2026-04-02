@@ -14,8 +14,6 @@ var path_line: Line2D
 
 @export var lineWidth: float = 5.0
 
-
-
 enum AgentState {
 	ACTIVE,
 	INACTIVE
@@ -27,7 +25,7 @@ enum AgentState {
 
 #eventually have us pass in the color from above so we're painting something new every time
 func _ready() -> void:
-	global_position = Vector2.ZERO
+	global_position = Vector2.ZERO + Vector2(randf_range(-20.0, 20.0), randf_range(-20.0, 20.0))
 
 	if sprite:
 		sprite.modulate = color
@@ -39,7 +37,7 @@ func _ready() -> void:
 	path_line.top_level = true
 	add_child(path_line)
 	path_line.add_point(global_position, 0)
-	path_line.add_point(Vector2.ZERO, 1)
+	path_line.add_point(global_position, 1)
 
 	velocity = Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)).normalized() * speed
 
@@ -89,14 +87,14 @@ func _impact(normal : Vector2) -> void:
 func reset() -> void:
 	direction = Vector2.ZERO
 	velocity = Vector2.ZERO
-	global_position = Vector2.ZERO
+	global_position = Vector2.ZERO + Vector2(randf_range(-20.0, 20.0), randf_range(-20.0, 20.0))
 	current_state = AgentState.ACTIVE
 	if sprite:
 		sprite.modulate = color
 	if path_line:
 		path_line.clear_points()
 		path_line.add_point(global_position, 0)
-		path_line.add_point(Vector2.ZERO, 1)
+		path_line.add_point(global_position, 1)
 
 func deactivate() -> void:
 	Signals.agent_deactivated.emit()

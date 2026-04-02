@@ -64,6 +64,10 @@ func _process(delta: float) -> void:
 	if GameManager.tm_state == GameManager.TeamworkGameState.RESETTING:
 		return
 
+	if Input.is_action_just_pressed("mouse"):
+		print("Mouse pressed - ensuring minimum reset time")
+		_ensure_min_reset_time(7.0)
+
 	# Poll all pending UDP requests for responses
 	_poll_pending_requests()
 
@@ -249,6 +253,12 @@ func _on_agent_deactivated() -> void:
 	print("An agent was deactivated. Active agent count: %d" % activeAgentCount)
 	if activeAgentCount <= 1:
 		reset_state()
+
+func _ensure_min_reset_time(min_seconds: float) -> void:
+	if reset_timer.is_stopped():
+		return
+	if reset_timer.time_left < min_seconds:
+		reset_timer.start(min_seconds)
 
 func set_timer() -> void:
 	reset_timer.stop()
